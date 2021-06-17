@@ -1,4 +1,5 @@
 import mysql.connector
+import json
 
 def lambda_handler(event, context):
     
@@ -24,11 +25,16 @@ def lambda_handler(event, context):
     # get and format data from database
     mycursor.execute("SELECT * FROM Smart_City WHERE id = " + str(id_number))
     data_list = mycursor.fetchall()[0]
-    data = str(data_list[0]) + " | " + data_list[1] + " | " + data_list[2] + " | "
+    data = {
+        'id': data_list[0],
+        'image_path': data_list[1],
+        'problem': data_list[2]
+    }
     mycursor.execute("SELECT ST_AsText(location) AS coordinates FROM Smart_City WHERE id = " + str(id_number))
     location = mycursor.fetchall()[0][0]
     location_list = location[6:-1].split()
     location_url = "https://www.google.com/maps/search/?api=1&query=" + location_list[1] + "%2C" + location_list[0]
-    data += location_url + " | " + str(data_list[4])
+    data['location'] = location_url
+    data['time_found'] = str(data_list[4])
 
     return data
