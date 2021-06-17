@@ -1,2 +1,1 @@
-# YU-Summer-Team-Green
-Green Team!
+# Smart-City
