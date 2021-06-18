@@ -14,25 +14,25 @@ def lambda_handler(event, context):
             'statusCode': 400,
             'body': "Four items required. Received " + str(len(event)) + "\n\nInput = " + s
         }
-    elif event["image_path"] == None:
-        return {
-            'statusCode': 400,
-            'body': "Image Path is a required field"
-        }
     elif event["problem"] == None:
         return {
             'statusCode': 400,
             'body': "Problem is a required field"
+        }
+    elif event["time_found"] == None:
+        return {
+            'statusCode': 400,
+            'body': "Time Found is a required field"
         }
     elif event["location"] == None:
         return {
             'statusCode': 400,
             'body': "Location is a required field"
         }
-    elif event["time_found"] == None:
+    elif event["image_path"] == None:
         return {
             'statusCode': 400,
-            'body': "Time Found is a required field"
+            'body': "Image Path is a required field"
         }
     
     # connect to MySQL
@@ -62,13 +62,13 @@ def lambda_handler(event, context):
         counter += 1
     
     # insert data into database
-    insert = "INSERT INTO Smart_City (image_path, problem, location, time_found) VALUES (%s, %s, point(%s, %s), %s)"
-    val = ("https://s3.console.aws.amazon.com/s3/buckets/smartcitytestbucket?region=us-east-1&prefix=" + str(id) + "/", event["problem"], event["location"][0], event["location"][1], event["time_found"]);
+    insert = "INSERT INTO Smart_City (problem, time_found, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
+    val = (event["problem"], event["time_found"], event["location"][0], event["location"][1], "https://s3.console.aws.amazon.com/s3/buckets/smartcitytestbucket?region=us-east-1&prefix=" + str(id) + "/");
     mycursor.execute(insert, val)
     mydb.commit()
 
 
     return {
-        'string': "Success",
+        'response': "Success",
         'statusCode' : 200
     }
