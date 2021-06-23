@@ -1,15 +1,19 @@
 import mysql.connector
 import json
 import datetime
+import boto3
 
 def lambda_handler(event, context):
     
     # connect to MySQL
+    client = boto3.client("secretsmanager")
+    secret = client.get_secret_value(SecretId='test/MySQL')
+    credentials = json.loads(secret['SecretString'])
     mydb = mysql.connector.connect(
-        host="smart-city-rds-0.ccmkepymppq8.us-east-1.rds.amazonaws.com",
-        user="admin",
-        password="Tester123",
-        database="Smart_City_0"
+        host=credentials['host'],
+        user=credentials['user'],
+        password=credentials['password'],
+        database=credentials['dbname']
     )
     
     # check input to ensure it is valid & initialize search string
@@ -26,30 +30,44 @@ def lambda_handler(event, context):
                 'statusCode': 400,
                 'body': "The ID you requested is not in the database. The ID must be of type int."
             }
-        search_list.append("id = " + str(event["id"]))
-
-    if "problem" in event:
-        if not isinstance(event["problem"], str):
+        search_list.append(f'id = {event["id"]}')
+        
+    if "problem_type" in event:
+        problem_type_list = ['Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', 'Other']
+        if event['problem_type'] not in problem_type_list:
             return {
                 'statusCode': 400,
-                'body': "The 'problem' must be of type string"
+                'body': "problem_type must be set to 'Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', or 'Other'"
             }
-        search_list.append("problem = '" + event["problem"] + "'")
+        search_list.append(f'problem_type = "{event["problem_type"]}"')
+        
+    if "problem_description" in event:
+        if not isinstance(event["problem_description"], str):
+            return {
+                'statusCode': 400,
+                'body': "'problem_description' must be of type string"
+            }
+        search_list.append(f'problem_description = "{event["problem_description"]}"')
 
     if "time_found" in event:
-        print(all(not isinstance(event["time_found"], str) for i in event["time_found"]))
         if len(event["time_found"]) != 2 or not all(isinstance(i, str) for i in event["time_found"]):
             return {
                 'statusCode': 400,
                 'body': "'time_found' takes a list of two 'times', both of type string. 'time' is formatted as follows: YYYY-MM-DD HH:MM:SS"
             }
-        time_list = [datetime.datetime.strptime(time, '%Y-%m-%d %H:%M:%S') for time in event["time_found"]]
+        try:
+            time_list = [datetime.datetime.strptime(time, '%Y-%m-%d %H:%M:%S') for time in event["time_found"]]
+        except ValueError:
+            return {
+                'statusCode': 400,
+                'body': "Each time in 'time_found' must be formatted as follows: YYYY-MM-DD HH:MM:SS"
+            }
         if time_list[0] >= time_list[1]:
             return {
                 'statusCode': 400,
                 'body': "The second time must be later than the first. 'time' is formatted as follows: YYYY-MM-DD HH:MM:SS"
             }
-        search_list.append("time_found BETWEEN '" + str(event["time_found"][0]) + "' AND '" + str(event["time_found"][1]) + "'")
+        search_list.append(f'time_found BETWEEN "{event["time_found"][0]}" AND "{event["time_found"][1]}"')
 
     if "current_status" in event:
         status_list = ['Open', 'In Progress', 'Complete']
@@ -58,7 +76,7 @@ def lambda_handler(event, context):
                 'statusCode': 400,
                 'body': "Current Status must be set to 'Open', 'In Progress', or 'Complete'"
                 }
-        search_list.append("current_status = '" + event["current_status"] + "'")
+        search_list.append(f'current_status = "{event["current_status"]}"')
 
     if "location" in event:
         if "distance" not in event:
@@ -76,7 +94,7 @@ def lambda_handler(event, context):
                 'statusCode': 400,
                 'body': "'distance' must be a number that is at least 0"
                 }
-        search_list.append("ST_Distance_Sphere(point(" + str(event["location"][1]) + ", " + str(event["location"][0]) + "), location) <= " + str(event["distance"]))
+        search_list.append(f'ST_Distance_Sphere(point({event["location"][1]}, {event["location"][0]}), location) <= {event["distance"]}')
 
     if "distance" in event and "location" not in event:
         return {
@@ -84,13 +102,13 @@ def lambda_handler(event, context):
             'body': "'distance' must always be paired with 'location'"
         }
 
-    if "image_path" in event: # dont think this would ever be searched...
+    if "image_path" in event:
         if not isinstance(event["image_path"], str):
             return {
                 'statusCode': 400,
                 'body': "'image_path' must be of type string"
                 }
-        search_list.append("image_path = '" + event["image_path"] + "'")
+        search_list.append(f'image_path = "{event["image_path"]}"')
     
     for search in search_list:
         if search != search_list[-1]:
@@ -105,16 +123,17 @@ def lambda_handler(event, context):
     for data in data_list:
         data_dict = {
             'id': data[0],
-            'problem': data[1],
-            'time_found': str(data[2]),
-            'current_status': data[3]
+            'problem_type': data[1],
+            'problem_description': data[2],
+            'time_found': str(data[3]),
+            'current_status': data[4]
         }
-        mycursor.execute("SELECT ST_AsText(location) AS coordinates FROM Smart_City WHERE id = " + str(data[0]))
+        mycursor.execute(f'SELECT ST_AsText(location) AS coordinates FROM Smart_City WHERE id = {data[0]}')
         location = mycursor.fetchall()[0][0]
         location_list = location[6:-1].split()
-        location_url = "https://www.google.com/maps/search/?api=1&query=" + location_list[1] + "%2C" + location_list[0]
+        location_url = f'https://www.google.com/maps/search/?api=1&query={location_list[1]}%2C{location_list[0]}'
         data_dict['location'] = location_url
-        data_dict['image_path'] = str(data[5])
+        data_dict['image_path'] = str(data[6])
         data_json.append(data_dict)
 
     return {
