@@ -33,10 +33,10 @@ def lambda_handler(event, context):
 
     # check input to ensure it is valid    
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT MAX(id) FROM employees")
-    last_id = mycursor.fetchall()[0][0] 
+    mycursor.execute("SELECT id FROM employees")
+    id_list = mycursor.fetchall()[0]
     id_number = event["id"]
-    if 1 > id_number <= last_id:
+    if id_number not in id_list:
         return {
             'statusCode': 400,
             'body': "The ID you requested is not in the database"
@@ -57,4 +57,3 @@ def lambda_handler(event, context):
         'statusCode' : 200,
         'response': f'Success, deleted: {info}'
     }
-    
