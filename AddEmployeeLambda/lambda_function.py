@@ -3,7 +3,7 @@ import json
 import boto3
 
 def lambda_handler(event, context):
-    
+
     # check input to ensure it is valid
     if len(event) != 4:
         s = ""
@@ -25,18 +25,18 @@ def lambda_handler(event, context):
             'statusCode': 400,
             'body': "'last_name' is a required field and must be of type string"
         }
+
     if "email" not in event or not isinstance(event["email"], str):
             return {
             'statusCode': 400,
-            'body': "'email' is a required field and must be of type string" 
-            #specify that it has to be an email address?
+            'body': "'email' is a required field and must be of type string"
         }
    
-    specialty_list = ['Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', 'Other']
-    if "specialty" not in event or event["specialty"] not in specialty_list:
+    department_list = ['Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', 'Other']
+    if "department" not in event or event["department"] not in department_list:
         return {
             'statusCode': 400,
-            'body': "'specialty' is a required field and must be 'Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', or 'Other'"
+            'body': "'department' is a required field and must be 'Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', or 'Other'"
         }
  
     # connect to MySQL
@@ -52,8 +52,8 @@ def lambda_handler(event, context):
     
     # insert data into database
     mycursor = mydb.cursor()    
-    insert = "INSERT INTO employees (first_name, last_name, email, specialty) VALUES (%s, %s, %s, %s)"
-    val = (event["first_name"], event["last_name"], event["email"], event["specialty"])
+    insert = "INSERT INTO employees (first_name, last_name, email, department) VALUES (%s, %s, %s, %s)"
+    val = (event["first_name"], event["last_name"], event["email"], event["department"])
     mycursor.execute(insert, val)
     mydb.commit()
 

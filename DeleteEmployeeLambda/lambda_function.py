@@ -45,15 +45,12 @@ def lambda_handler(event, context):
     mycursor.execute(f'SELECT * FROM employees WHERE id = {event["id"]}')
     info = mycursor.fetchall()[0]
 
-
     # delete data from database
-      
     delete = f'DELETE FROM employees WHERE id = {id_number}'
     mycursor.execute(delete)
-    print(info)
     mydb.commit()
 
     return {
         'statusCode' : 200,
-        'response': f'Success, deleted: {info}'
+        'response': f'Success, deleted: {info} from the table'
     }
