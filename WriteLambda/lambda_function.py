@@ -2,19 +2,21 @@ import mysql.connector
 import json
 import base64
 import boto3
+import botocore.config
 import datetime
+import os;
 
 def lambda_handler(event, context):
     
     # check input to ensure it is valid
     
-    if len(event) != 5:
+    if len(event) != 4:
         s = ""
         for item in event:
             s = s + '\n' + item + ": " + str(event[item])
         return {
             'statusCode': 400,
-            'body': "Five items required. Received " + str(len(event)) + "\n\nInput = " + s
+            'body': "Four items required. Received " + str(len(event)) + "\n\nInput = " + s
         }
     
     problem_type_list = ['Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', 'Other']
@@ -30,19 +32,6 @@ def lambda_handler(event, context):
             'body': "'problem_description' is a required field and must be of type string"
         }
         
-    if "time_found" not in event or not isinstance(event["time_found"], str):
-        return {
-            'statusCode': 400,
-            'body': "'time_found' is a required field"
-        }
-    else:
-        try:
-            datetime.datetime.strptime(event["time_found"], '%Y-%m-%d %H:%M:%S')
-        except ValueError:
-            return {
-                'statusCode': 400,
-                'body': "'time_found' must be formatted as follows: YYYY-MM-DD HH:MM:SS"
-            }
     
     if "location" not in event or not isinstance(event["location"], list) or len(event["location"]) != 2 or not all(isinstance(i, float) for i in event["location"]) or not -90 <= event["location"][0] <= 90 or not -180 <= event["location"][1] <= 180:
         return {
@@ -57,8 +46,8 @@ def lambda_handler(event, context):
         }
     
     # connect to MySQL
-    client = boto3.client("secretsmanager")
-    secret = client.get_secret_value(SecretId='test/MySQL')
+    sm = boto3.client("secretsmanager")
+    secret = sm.get_secret_value(SecretId='test/MySQL')
     credentials = json.loads(secret['SecretString'])
     mydb = mysql.connector.connect(
         host=credentials['host'],
@@ -74,29 +63,31 @@ def lambda_handler(event, context):
     
     # upload images to new folder in S3 Bucket
     counter = 0
-    print(74)
-    s3 = boto3.resource("s3")
-    print(76)
-    bucket = s3.Bucket("smartcitytestbucket")
-    print(78)
+    s3 = boto3.client('s3', 'us-east-1', config=botocore.config.Config(s3={'addressing_style':'path'}))
     for img in event["image_path"]:
-        file_name = "img" + str(counter) + ".jpg"
-        lambda_path = str(id_number) + "/" + file_name
-        print(82)
-        
+        file_name = f'img{counter}.jpg'
+        lambda_path = f'{id_number}/{file_name}'
+
         img = base64.b64decode(event["image_path"][counter])     # decode the encoded image data (base64)
-        print(85)
-        
-        bucket.put_object(Key=lambda_path, Body=img)
+
+        # bucket.put_object(Key=lambda_path, Body=img)
+        s3.put_object(Bucket=os.environ['BUCKET_NAME'], Key=lambda_path, Body=img)
         counter += 1
-        print(89)
-    
+
     # insert data into database
-    insert = "INSERT INTO Smart_City (problem_type, problem_description, time_found, location, image_path) VALUES (%s, %s, %s, point(%s, %s), %s)"
-    val = (event["problem_type"], event["problem_description"], event["time_found"], event["location"][0], event["location"][1], "https://s3.console.aws.amazon.com/s3/buckets/smartcitytestbucket?region=us-east-1&prefix=" + str(id_number) + "/")
+    insert = "INSERT INTO Smart_City (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
+    val = (event["problem_type"], event["problem_description"], event["location"][0], event["location"][1], "https://s3.console.aws.amazon.com/s3/buckets/smartcitytestbucket?region=us-east-1&prefix=" + str(id_number) + "/")
     mycursor.execute(insert, val)
     mydb.commit()
-
+    
+    # sns_client = boto3.client('sns', region_name=region)
+    # sns_client.publish(TopicArn=topic_arn, Message=message, MessageAttributes=message_attributes)
+    # client = boto3.client('sns')
+    # response = client.publish(
+    #  TopicArn=os.environ['SNS_TOPIC'],
+    #  Message="Problem Type: " + event['problem_type'] + "\nProblem Description: " + event['problem_description'] + "\nLocation: " + str(event["location"][0]) + ", " + str(event["location"][1]),
+    #  Subject="New Issue Report"
+    # )
 
     return {
         'statusCode' : 200,

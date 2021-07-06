@@ -24,11 +24,18 @@ def lambda_handler(event, context):
 
     mycursor.execute("SELECT MAX(id) FROM Smart_City")
     last_id = mycursor.fetchall()[0][0]
+    event_id = int(event["id"])
+    
     if "id" in event:
-        if not isinstance(event["id"], int) or event["id"] > last_id or event["id"] < 1:
+        if event_id > last_id:
             return {
                 'statusCode': 400,
-                'body': "The ID you requested is not in the database. The ID must be of type int."
+                'body': "Event ID can't be greater than last ID."
+            }
+        if event_id < 1:
+            return {
+                'statusCode': 400,
+                'body': "ID cannot be less than 1."
             }
         search_list.append(f'id = {event["id"]}')
         
@@ -137,6 +144,6 @@ def lambda_handler(event, context):
         data_json.append(data_dict)
 
     return {
-        "status code": 200,
+        "statusCode": 200,
         "body": json.dumps(data_json)
     }

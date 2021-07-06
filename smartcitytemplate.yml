@@ -1,0 +1,203 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: Deploys Smart City API Gateway with Lambda integrations
+Resources:
+  SmartCityS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: BucketOwnerFullControl
+  SmartCityS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties: 
+      Bucket: !Ref SmartCityS3Bucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 's3:*'
+            Effect: Allow
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref SmartCityS3Bucket
+                - /*
+            Principal: '*'
+  smartCityAPIGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description: Smart City API Gateway
+      Name: smartCityAPIGateway
+      EndpointConfiguration:
+        Types:
+          - EDGE
+  apiGatewayPost:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      # RequestParameters: 
+      #   method.request.querystring.location: 'true'
+      #   method.request.querystring.problem_type: 'true'
+      #   method.request.querystring.problem_description: 'true'
+      #   method.request.querystring.image_path: 'true'
+      Integration:
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - StatusCode: 200
+        Type: AWS_PROXY
+        # RequestParameters: 
+        #   integration.request.querystring.location: method.request.querystring.location
+        #   integration.request.querystring.problem_type: method.request.querystring.problem_type
+        #   integration.request.querystring.problem_description: method.request.querystring.problem_description
+        #   integration.request.querystring.image_path: method.request.querystring.image_path
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !GetAtt smartCityWrite.Arn
+      ResourceId: !GetAtt smartCityAPIGateway.RootResourceId
+      RestApiId: !Ref smartCityAPIGateway
+  apiGatewayGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: GET
+      RequestParameters: 
+        method.request.querystring.id: 'true'
+        method.request.querystring.problem_type: 'false'
+        method.request.querystring.problem_description: 'false'
+        method.request.querystring.time_found: 'false'
+        method.request.querystring.current_status: 'false'
+        method.request.querystring.location: 'false'
+        method.request.querystring.distance: 'false'
+        method.request.querystring.image_path: 'false'
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        RequestParameters: 
+          integration.request.querystring.id: method.request.querystring.id
+          integration.request.querystring.problem_type: method.request.querystring.problem_type
+          integration.request.querystring.problem_description: method.request.querystring.problem_description
+          integration.request.querystring.time_found: method.request.querystring.time_found
+          integration.request.querystring.current_status: method.request.querystring.current_status
+          integration.request.querystring.location: method.request.querystring.location
+          integration.request.querystring.distance: method.request.querystring.distance
+          integration.request.querystring.image_path: method.request.querystring.image_path
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !GetAtt smartCityRead.Arn
+      ResourceId: !GetAtt smartCityAPIGateway.RootResourceId
+      RestApiId: !Ref smartCityAPIGateway
+  apiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - apiGatewayPost
+      - apiGatewayGet
+    Properties:
+      RestApiId: !Ref smartCityAPIGateway
+      StageName: deployedStage
+  APILambdaPostPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !Ref smartCityWrite
+      Principal: "apigateway.amazonaws.com"
+  APILambdaGetPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !Ref smartCityRead
+      Principal: "apigateway.amazonaws.com"
+  SmartCityLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: smart-city-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: '/'
+      Policies:
+      - PolicyName: logs
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - secretsmanager:*
+            - s3:*
+            Resource: 
+            - !GetAtt SmartCityS3Bucket.Arn
+            - arn:*:logs:*:*:*
+            - arn:aws:secretsmanager:us-east-1:287420233372:secret:test/MySQL-BG5WM0
+  smartCityWrite:
+    Type: AWS::Serverless::Function
+    Properties:
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Action:
+          - s3:PutObject
+          - s3:PutObjectAcl
+          - s3:GetObject
+          - s3:GetObjectAcl
+          - s3:DeleteObject
+          Effect: 'Allow'
+          Resource: !GetAtt ${SmartCityS3Bucket.Arn}/* #!Sub ${SmartCityS3Bucket.Arn}/*
+          Principal: "*"
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref SmartCityS3Bucket
+          SNS_TOPIC: !Ref mySNS
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+        SNSEvent:
+          Type: SNS
+          Properties:
+            Topic: !Ref mySNS #arn:aws:sns:us-east-1:123456789012:my_topic
+            SqsSubscription: false
+      CodeUri: s3://write-lambda-bucket/write-lambda.zip
+      Runtime: python3.8
+      Handler: smartCityWriteLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+  smartCityRead:
+    Type: AWS::Serverless::Function
+    Properties:
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+      CodeUri: s3://read-lambda-bucket/read-lambda.zip
+      Runtime: python3.8
+      Handler: smartCityReadLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+  mySNS:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: SmartCitySNS
+      TopicName: SmartCitySNS
+      Subscription:
+      - Endpoint: smartcitysns@gmail.com
+        Protocol: email
+  EmailSNSSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: smartcitysns@gmail.com
+      Protocol: email
+      TopicArn: !Ref mySNS 
+  # LambdaPublishToSNSPermission:
+  #   Type: AWS::Lambda::Permission
+  #   Properties:
+  #     Action: sns:Publish
+  #     FunctionName: !Ref smartCityWrite
+  #     Principal: "sns.amazonaws.com"
