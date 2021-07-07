@@ -35,21 +35,11 @@ Resources:
     Properties:
       AuthorizationType: NONE
       HttpMethod: POST
-      # RequestParameters: 
-      #   method.request.querystring.location: 'true'
-      #   method.request.querystring.problem_type: 'true'
-      #   method.request.querystring.problem_description: 'true'
-      #   method.request.querystring.image_path: 'true'
       Integration:
         IntegrationHttpMethod: POST
         IntegrationResponses:
           - StatusCode: 200
         Type: AWS_PROXY
-        # RequestParameters: 
-        #   integration.request.querystring.location: method.request.querystring.location
-        #   integration.request.querystring.problem_type: method.request.querystring.problem_type
-        #   integration.request.querystring.problem_description: method.request.querystring.problem_description
-        #   integration.request.querystring.image_path: method.request.querystring.image_path
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
           - lambdaArn: !GetAtt smartCityWrite.Arn
@@ -143,18 +133,6 @@ Resources:
   smartCityWrite:
     Type: AWS::Serverless::Function
     Properties:
-      # Policies:
-      # - Version: '2012-10-17'
-      #   Statement:
-      #   - Action:
-      #     - s3:PutObject
-      #     - s3:PutObjectAcl
-      #     - s3:GetObject
-      #     - s3:GetObjectAcl
-      #     - s3:DeleteObject
-      #     Effect: 'Allow'
-      #     Resource: !GetAtt ${SmartCityS3Bucket.Arn}/* #!Sub ${SmartCityS3Bucket.Arn}/*
-      #     Principal: "*"
       Environment:
         Variables:
           BUCKET_NAME: !Ref SmartCityS3Bucket
@@ -174,6 +152,8 @@ Resources:
       Runtime: python3.8
       Handler: smartCityWriteLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
   smartCityRead:
     Type: AWS::Serverless::Function
     Properties:
@@ -187,6 +167,8 @@ Resources:
       Runtime: python3.8
       Handler: smartCityReadLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
   mySNS:
     Type: AWS::SNS::Topic
     Properties:
@@ -200,10 +182,10 @@ Resources:
     Properties:
       Endpoint: smartcitysns@gmail.com
       Protocol: email
-      TopicArn: !Ref mySNS 
-  # LambdaPublishToSNSPermission:
-  #   Type: AWS::Lambda::Permission
-  #   Properties:
-  #     Action: sns:Publish
-  #     FunctionName: !Ref smartCityWrite
-  #     Principal: "sns.amazonaws.com"
+      TopicArn: !Ref mySNS
+
+  myLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: smartCityS3Layer
+      ContentUri: s3://mysql-layer/python.zip
