@@ -8,7 +8,7 @@ Resources:
       AccessControl: BucketOwnerFullControl
   SmartCityS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
-    Properties: 
+    Properties:
       Bucket: !Ref SmartCityS3Bucket
       PolicyDocument:
         Version: 2012-10-17
@@ -30,52 +30,15 @@ Resources:
       EndpointConfiguration:
         Types:
           - EDGE
-
-#  ProxyMethod:
-  #    Type: 'AWS::ApiGateway::Method'
-  #    Properties:
-  #      HttpMethod: ANY
-  #      ResourceId: !Ref Resource
-  #      RestApiId: !Ref apiGateway
-  #      AuthorizationType: NONE
-  #      RequestParameters:
-  #        method.request.path.proxy: true
-  #      Integration:
-  #        CacheKeyParameters:
-  #          - 'method.request.path.proxy'
-  #        RequestParameters:
-  #          integration.request.path.proxy: 'method.request.path.proxy'
-  #        Type: AWS_PROXY
-  #        IntegrationHttpMethod: ANY
-  #        Uri: !Sub
-  #          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Arn}/invocations
-  #          - Arn:
-  #              Fn::GetAtt:
-  #               - LambdaFunction
-  #               - Arn
-  #        PassthroughBehavior: WHEN_NO_MATCH
-  #        IntegrationResponses:
-  #          - StatusCode: 200
-
   apiGatewayPost:
     Type: AWS::ApiGateway::Method
     Properties:
       AuthorizationType: NONE
       HttpMethod: POST
-      RequestParameters:
-        method.request.path.proxy: true
       Integration:
-        CacheKeyParameters:
-          - 'method.request.path.proxy'
-        RequestParameters:
-          integration.request.path.proxy: 'method.request.path.proxy'
         IntegrationHttpMethod: POST
         IntegrationResponses:
           - StatusCode: 200
-            ResponseTemplates:
-              application/json: $input.json('$.body')
-        RequestTemplates:
-          application/json: '{}'
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
@@ -87,7 +50,7 @@ Resources:
     Properties:
       AuthorizationType: NONE
       HttpMethod: GET
-      RequestParameters: 
+      RequestParameters:
         method.request.querystring.id: 'true'
         method.request.querystring.problem_type: 'false'
         method.request.querystring.problem_description: 'false'
@@ -99,7 +62,7 @@ Resources:
       Integration:
         IntegrationHttpMethod: POST
         Type: AWS_PROXY
-        RequestParameters: 
+        RequestParameters:
           integration.request.querystring.id: method.request.querystring.id
           integration.request.querystring.problem_type: method.request.querystring.problem_type
           integration.request.querystring.problem_description: method.request.querystring.problem_description
@@ -157,25 +120,20 @@ Resources:
             - logs:PutLogEvents
             - secretsmanager:*
             - s3:*
-            Resource: 
+            Resource:
             - !GetAtt SmartCityS3Bucket.Arn
             - arn:*:logs:*:*:*
             - arn:aws:secretsmanager:us-east-1:287420233372:secret:test/MySQL-BG5WM0
+          - Effect: Allow
+            Action:
+            - sns:*
+            Resource:
+            - "*"
+            #- !Ref smartCityWrite
   smartCityWrite:
     Type: AWS::Serverless::Function
     Properties:
-      Policies:
-      - Version: '2012-10-17'
-        Statement:
-        - Action:
-          - s3:PutObject
-          - s3:PutObjectAcl
-          - s3:GetObject
-          - s3:GetObjectAcl
-          - s3:DeleteObject
-          Effect: 'Allow'
-          Resource: !GetAtt ${SmartCityS3Bucket.Arn}/* #!Sub ${SmartCityS3Bucket.Arn}/*
-          Principal: "*"
+      FunctionName: CloudFormation-SmartCityWriteLambda
       Environment:
         Variables:
           BUCKET_NAME: !Ref SmartCityS3Bucket
@@ -193,11 +151,14 @@ Resources:
             SqsSubscription: false
       CodeUri: s3://write-lambda-bucket/write-lambda.zip
       Runtime: python3.8
-      Handler: smartCityWriteLambda.lambda_handler
+      Handler: WriteLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
   smartCityRead:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: CloudFormation-SmartCityReadLambda
       Events:
         ApiEvent:
           Type: Api
@@ -206,8 +167,40 @@ Resources:
             Method: GET
       CodeUri: s3://read-lambda-bucket/read-lambda.zip
       Runtime: python3.8
-      Handler: smartCityReadLambda.lambda_handler
+      Handler: ReadLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
+  addEmployee:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-AddEmployee
+      CodeUri: s3://add-employee-lambda-bucket/add-employee-lambda.zip
+      Runtime: python3.8
+      Handler: AddEmployeeLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
+  deleteEmployee:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-DeleteEmployee
+      CodeUri: s3://delete-employee-lambda-bucket/delete-employee-lambda.zip
+      Runtime: python3.8
+      Handler: DeleteEmployeeLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
+  updateLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-UpdateLambda
+      CodeUri: s3://update-lambda-bucket/update-lambda.zip
+      Runtime: python3.8
+      Handler: UpdateLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
   mySNS:
     Type: AWS::SNS::Topic
     Properties:
@@ -221,10 +214,9 @@ Resources:
     Properties:
       Endpoint: smartcitysns@gmail.com
       Protocol: email
-      TopicArn: !Ref mySNS 
-  # LambdaPublishToSNSPermission:
-  #   Type: AWS::Lambda::Permission
-  #   Properties:
-  #     Action: sns:Publish
-  #     FunctionName: !Ref smartCityWrite
-  #     Principal: "sns.amazonaws.com"
+      TopicArn: !Ref mySNS
+  myLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: smartCityS3Layer
+      ContentUri: s3://mysql-layer/python.zip
