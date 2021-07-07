@@ -30,53 +30,26 @@ Resources:
       EndpointConfiguration:
         Types:
           - EDGE
-
-#  ProxyMethod:
-  #    Type: 'AWS::ApiGateway::Method'
-  #    Properties:
-  #      HttpMethod: ANY
-  #      ResourceId: !Ref Resource
-  #      RestApiId: !Ref apiGateway
-  #      AuthorizationType: NONE
-  #      RequestParameters:
-  #        method.request.path.proxy: true
-  #      Integration:
-  #        CacheKeyParameters:
-  #          - 'method.request.path.proxy'
-  #        RequestParameters:
-  #          integration.request.path.proxy: 'method.request.path.proxy'
-  #        Type: AWS_PROXY
-  #        IntegrationHttpMethod: ANY
-  #        Uri: !Sub
-  #          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Arn}/invocations
-  #          - Arn:
-  #              Fn::GetAtt:
-  #               - LambdaFunction
-  #               - Arn
-  #        PassthroughBehavior: WHEN_NO_MATCH
-  #        IntegrationResponses:
-  #          - StatusCode: 200
-
   apiGatewayPost:
     Type: AWS::ApiGateway::Method
     Properties:
       AuthorizationType: NONE
       HttpMethod: POST
-      RequestParameters:
-        method.request.path.proxy: true
+      # RequestParameters: 
+      #   method.request.querystring.location: 'true'
+      #   method.request.querystring.problem_type: 'true'
+      #   method.request.querystring.problem_description: 'true'
+      #   method.request.querystring.image_path: 'true'
       Integration:
-        CacheKeyParameters:
-          - 'method.request.path.proxy'
-        RequestParameters:
-          integration.request.path.proxy: 'method.request.path.proxy'
         IntegrationHttpMethod: POST
         IntegrationResponses:
           - StatusCode: 200
-            ResponseTemplates:
-              application/json: $input.json('$.body')
-        RequestTemplates:
-          application/json: '{}'
         Type: AWS_PROXY
+        # RequestParameters: 
+        #   integration.request.querystring.location: method.request.querystring.location
+        #   integration.request.querystring.problem_type: method.request.querystring.problem_type
+        #   integration.request.querystring.problem_description: method.request.querystring.problem_description
+        #   integration.request.querystring.image_path: method.request.querystring.image_path
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
           - lambdaArn: !GetAtt smartCityWrite.Arn
@@ -161,21 +134,27 @@ Resources:
             - !GetAtt SmartCityS3Bucket.Arn
             - arn:*:logs:*:*:*
             - arn:aws:secretsmanager:us-east-1:287420233372:secret:test/MySQL-BG5WM0
+          - Effect: Allow
+            Action:
+            - sns:*
+            Resource:
+            - "*"
+            #- !Ref smartCityWrite
   smartCityWrite:
     Type: AWS::Serverless::Function
     Properties:
-      Policies:
-      - Version: '2012-10-17'
-        Statement:
-        - Action:
-          - s3:PutObject
-          - s3:PutObjectAcl
-          - s3:GetObject
-          - s3:GetObjectAcl
-          - s3:DeleteObject
-          Effect: 'Allow'
-          Resource: !GetAtt ${SmartCityS3Bucket.Arn}/* #!Sub ${SmartCityS3Bucket.Arn}/*
-          Principal: "*"
+      # Policies:
+      # - Version: '2012-10-17'
+      #   Statement:
+      #   - Action:
+      #     - s3:PutObject
+      #     - s3:PutObjectAcl
+      #     - s3:GetObject
+      #     - s3:GetObjectAcl
+      #     - s3:DeleteObject
+      #     Effect: 'Allow'
+      #     Resource: !GetAtt ${SmartCityS3Bucket.Arn}/* #!Sub ${SmartCityS3Bucket.Arn}/*
+      #     Principal: "*"
       Environment:
         Variables:
           BUCKET_NAME: !Ref SmartCityS3Bucket
