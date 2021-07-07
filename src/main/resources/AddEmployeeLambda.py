@@ -1,6 +1,6 @@
-import mysql.connector
 import json
 import boto3
+import mysql.connector
 
 def lambda_handler(event, context):
 
@@ -25,7 +25,7 @@ def lambda_handler(event, context):
             'statusCode': 400,
             'body': "'last_name' is a required field and must be of type string"
         }
-
+        
     if "email" not in event or not isinstance(event["email"], str):
             return {
             'statusCode': 400,
@@ -40,8 +40,8 @@ def lambda_handler(event, context):
         }
  
     # connect to MySQL
-    client = boto3.client("secretsmanager")
-    secret = client.get_secret_value(SecretId='test/MySQL')
+    sm_client = boto3.client("secretsmanager")
+    secret = sm_client.get_secret_value(SecretId='test/MySQL')
     credentials = json.loads(secret['SecretString'])
     mydb = mysql.connector.connect(
         host=credentials['host'],
@@ -49,9 +49,9 @@ def lambda_handler(event, context):
         password=credentials['password'],
         database=credentials['dbname']
     )
+    mycursor = mydb.cursor()
     
-    # insert data into database
-    mycursor = mydb.cursor()    
+    # insert employee into employees table
     insert = "INSERT INTO employees (first_name, last_name, email, department) VALUES (%s, %s, %s, %s)"
     val = (event["first_name"], event["last_name"], event["email"], event["department"])
     mycursor.execute(insert, val)
@@ -59,5 +59,5 @@ def lambda_handler(event, context):
 
     return {
         'statusCode' : 200,
-        'response': "Success"
+        'response': f"Success, inserted {event['first_name']} {event['last_name']} into table"
     }
