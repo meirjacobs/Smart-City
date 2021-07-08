@@ -8,7 +8,7 @@ Resources:
       AccessControl: BucketOwnerFullControl
   SmartCityS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
-    Properties: 
+    Properties:
       Bucket: !Ref SmartCityS3Bucket
       PolicyDocument:
         Version: 2012-10-17
@@ -50,7 +50,7 @@ Resources:
     Properties:
       AuthorizationType: NONE
       HttpMethod: GET
-      RequestParameters: 
+      RequestParameters:
         method.request.querystring.id: 'true'
         method.request.querystring.problem_type: 'false'
         method.request.querystring.problem_description: 'false'
@@ -62,7 +62,7 @@ Resources:
       Integration:
         IntegrationHttpMethod: POST
         Type: AWS_PROXY
-        RequestParameters: 
+        RequestParameters:
           integration.request.querystring.id: method.request.querystring.id
           integration.request.querystring.problem_type: method.request.querystring.problem_type
           integration.request.querystring.problem_description: method.request.querystring.problem_description
@@ -120,7 +120,7 @@ Resources:
             - logs:PutLogEvents
             - secretsmanager:*
             - s3:*
-            Resource: 
+            Resource:
             - !GetAtt SmartCityS3Bucket.Arn
             - arn:*:logs:*:*:*
             - arn:aws:secretsmanager:us-east-1:287420233372:secret:test/MySQL-BG5WM0

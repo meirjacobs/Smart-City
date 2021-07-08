@@ -1,6 +1,6 @@
-import mysql.connector
 import json
 import boto3
+import mysql.connector
 
 def lambda_handler(event, context):
     
@@ -21,8 +21,8 @@ def lambda_handler(event, context):
         }
 
     # connect to MySQL
-    client = boto3.client("secretsmanager")
-    secret = client.get_secret_value(SecretId='test/MySQL')
+    sm_client = boto3.client("secretsmanager")
+    secret = sm_client.get_secret_value(SecretId='test/MySQL')
     credentials = json.loads(secret['SecretString'])
     mydb = mysql.connector.connect(
         host=credentials['host'],
@@ -30,27 +30,29 @@ def lambda_handler(event, context):
         password=credentials['password'],
         database=credentials['dbname']
     )
-
-    # check input to ensure it is valid    
     mycursor = mydb.cursor()
+
+    # check input to ensure it is valid
     mycursor.execute("SELECT id FROM employees")
-    id_list = mycursor.fetchall()[0]
+    id_data = mycursor.fetchall()
+    id_list = [id[0] for id in id_data]
     id_number = event["id"]
     if id_number not in id_list:
         return {
             'statusCode': 400,
-            'body': "The ID you requested is not in the database"
-        }     
+            'body': f"The ID {id_number} you requested is not in the database"
+        }
         
-    mycursor.execute(f'SELECT * FROM employees WHERE id = {event["id"]}')
-    info = mycursor.fetchall()[0]
+    # store employee's data
+    mycursor.execute(f'SELECT * FROM employees WHERE id = {id_number}')
+    data = mycursor.fetchall()[0]
 
-    # delete data from database
+    # delete employee from employees table
     delete = f'DELETE FROM employees WHERE id = {id_number}'
     mycursor.execute(delete)
     mydb.commit()
 
     return {
         'statusCode' : 200,
-        'response': f'Success, deleted: {info} from the table'
+        'response': f'Success, deleted: {data} from the table'
     }

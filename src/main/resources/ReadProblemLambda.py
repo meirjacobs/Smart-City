@@ -1,13 +1,13 @@
-import mysql.connector
-import json
 import datetime
+import json
 import boto3
+import mysql.connector
 
 def lambda_handler(event, context):
     
     # connect to MySQL
-    client = boto3.client("secretsmanager")
-    secret = client.get_secret_value(SecretId='test/MySQL')
+    sm_client = boto3.client("secretsmanager")
+    secret = sm_client.get_secret_value(SecretId='test/MySQL')
     credentials = json.loads(secret['SecretString'])
     mydb = mysql.connector.connect(
         host=credentials['host'],
@@ -15,27 +15,22 @@ def lambda_handler(event, context):
         password=credentials['password'],
         database=credentials['dbname']
     )
+    mycursor = mydb.cursor()
     
     # check input to ensure it is valid & initialize search string
     event = event["queryStringParameters"]
-    mycursor = mydb.cursor()
-    search_string = "SELECT * FROM Smart_City WHERE "
+    search_string = "SELECT * FROM problems WHERE "
     search_list = []
-
-    mycursor.execute("SELECT MAX(id) FROM Smart_City")
-    last_id = mycursor.fetchall()[0][0]
-    event_id = int(event["id"])
     
     if "id" in event:
-        if event_id > last_id:
+        mycursor.execute("SELECT id FROM problems")
+        id_data = mycursor.fetchall()
+        id_list = [i[0] for i in id_data]
+        id_number = event["id"]
+        if id_number not in id_list:
             return {
                 'statusCode': 400,
-                'body': "Event ID can't be greater than last ID."
-            }
-        if event_id < 1:
-            return {
-                'statusCode': 400,
-                'body': "ID cannot be less than 1."
+                'body': f"The ID {id_number} you requested is not in the problems table"
             }
         search_list.append(f'id = {event["id"]}')
         
@@ -82,7 +77,7 @@ def lambda_handler(event, context):
             return {
                 'statusCode': 400,
                 'body': "Current Status must be set to 'Open', 'In Progress', or 'Complete'"
-                }
+            }
         search_list.append(f'current_status = "{event["current_status"]}"')
 
     if "location" in event:
@@ -90,17 +85,17 @@ def lambda_handler(event, context):
             return {
                 'statusCode': 400,
                 'body': "'location must always be paired with 'distance'"
-                }
+            }
         if len(event["location"]) != 2 or not all(isinstance(i, float) for i in event["location"]) or not -90 <= event["location"][0] <= 90 or not -180 <= event["location"][1] <= 180:
             return {
                 'statusCode': 400,
                 'body': "'location' takes a list of two points, both of type float. The first represents the latitude (which must be a number between -90 and 90) and the second represents the longitude (which must be a number between -180 and 180)"
-                }
+            }
         if not isinstance(event["distance"], (int, float)) or event["distance"] < 0:
             return {
                 'statusCode': 400,
                 'body': "'distance' must be a number that is at least 0"
-                }
+            }
         search_list.append(f'ST_Distance_Sphere(point({event["location"][1]}, {event["location"][0]}), location) <= {event["distance"]}')
 
     if "distance" in event and "location" not in event:
@@ -114,7 +109,7 @@ def lambda_handler(event, context):
             return {
                 'statusCode': 400,
                 'body': "'image_path' must be of type string"
-                }
+            }
         search_list.append(f'image_path = "{event["image_path"]}"')
     
     for search in search_list:
@@ -123,7 +118,7 @@ def lambda_handler(event, context):
         else:
             search_string += search
 
-    # get and format data from database
+    # get and format data from problems table
     mycursor.execute(search_string)
     data_list = mycursor.fetchall()
     data_json = []
@@ -135,15 +130,15 @@ def lambda_handler(event, context):
             'time_found': str(data[3]),
             'current_status': data[4]
         }
-        mycursor.execute(f'SELECT ST_AsText(location) AS coordinates FROM Smart_City WHERE id = {data[0]}')
+        mycursor.execute(f'SELECT ST_AsText(location) AS coordinates FROM problems WHERE id = {data[0]}')
         location = mycursor.fetchall()[0][0]
         location_list = location[6:-1].split()
         location_url = f'https://www.google.com/maps/search/?api=1&query={location_list[1]}%2C{location_list[0]}'
         data_dict['location'] = location_url
         data_dict['image_path'] = str(data[6])
         data_json.append(data_dict)
-
+       
     return {
         "statusCode": 200,
-        "body": json.dumps(data_json)
+        "body": "Search Results: \n" + json.dumps(data_json)
     }
