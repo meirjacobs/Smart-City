@@ -129,7 +129,6 @@ Resources:
             - sns:*
             Resource:
             - "*"
-            #- !Ref smartCityWrite
   smartCityWrite:
     Type: AWS::Serverless::Function
     Properties:
@@ -139,19 +138,14 @@ Resources:
           BUCKET_NAME: !Ref SmartCityS3Bucket
           SNS_TOPIC: !Ref mySNS
       Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /
-            Method: POST
         SNSEvent:
           Type: SNS
           Properties:
-            Topic: !Ref mySNS #arn:aws:sns:us-east-1:123456789012:my_topic
+            Topic: !Ref mySNS
             SqsSubscription: false
       CodeUri: s3://write-lambda-bucket/write-lambda.zip
       Runtime: python3.8
-      Handler: WriteLambda.lambda_handler
+      Handler: WriteProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
@@ -160,14 +154,9 @@ Resources:
     Properties:
       FunctionName: CloudFormation-SmartCityReadLambda
       Events:
-        ApiEvent:
-          Type: Api
-          Properties:
-            Path: /
-            Method: GET
       CodeUri: s3://read-lambda-bucket/read-lambda.zip
       Runtime: python3.8
-      Handler: ReadLambda.lambda_handler
+      Handler: ReadProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
