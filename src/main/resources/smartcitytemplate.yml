@@ -133,6 +133,7 @@ Resources:
   smartCityWrite:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: CloudFormation-SmartCityWriteLambda
       Environment:
         Variables:
           BUCKET_NAME: !Ref SmartCityS3Bucket
@@ -150,13 +151,14 @@ Resources:
             SqsSubscription: false
       CodeUri: s3://write-lambda-bucket/write-lambda.zip
       Runtime: python3.8
-      Handler: smartCityWriteLambda.lambda_handler
+      Handler: WriteLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
   smartCityRead:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: CloudFormation-SmartCityReadLambda
       Events:
         ApiEvent:
           Type: Api
@@ -165,7 +167,37 @@ Resources:
             Method: GET
       CodeUri: s3://read-lambda-bucket/read-lambda.zip
       Runtime: python3.8
-      Handler: smartCityReadLambda.lambda_handler
+      Handler: ReadLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
+  addEmployee:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-AddEmployee
+      CodeUri: s3://add-employee-lambda-bucket/add-employee-lambda.zip
+      Runtime: python3.8
+      Handler: AddEmployeeLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
+  deleteEmployee:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-DeleteEmployee
+      CodeUri: s3://delete-employee-lambda-bucket/delete-employee-lambda.zip
+      Runtime: python3.8
+      Handler: DeleteEmployeeLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
+  updateLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-UpdateLambda
+      CodeUri: s3://update-lambda-bucket/update-lambda.zip
+      Runtime: python3.8
+      Handler: UpdateLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
@@ -183,7 +215,6 @@ Resources:
       Endpoint: smartcitysns@gmail.com
       Protocol: email
       TopicArn: !Ref mySNS
-
   myLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
