@@ -6,6 +6,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: BucketOwnerFullControl
+      BucketName: smartcitys3bucket
   SmartCityS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -120,7 +121,10 @@ Resources:
             - logs:PutLogEvents
             - secretsmanager:*
             - s3:*
+            - lambda:InvokeFunction
+            - lambda:InvokeAsync
             Resource:
+            - arn:aws:lambda:*:*:function:*
             - !GetAtt SmartCityS3Bucket.Arn
             - arn:*:logs:*:*:*
             - arn:aws:secretsmanager:us-east-1:287420233372:secret:test/MySQL-BG5WM0
@@ -187,6 +191,16 @@ Resources:
       CodeUri: s3://update-lambda-bucket/update-lambda.zip
       Runtime: python3.8
       Handler: UpdateLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
+  logLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-LogLambda
+      CodeUri: s3://log-lambda-bucket/log-lambda.zip
+      Runtime: python3.8
+      Handler: LogLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
