@@ -25,15 +25,14 @@ def lambda_handler(event, context):
     if "id" in event:
         mycursor.execute("SELECT id FROM problems")
         id_data = mycursor.fetchall()
-        id_list = [i[0] for i in id_data]
-        id_number = event["id"]
+        id_list = [str(i[0]) for i in id_data]
+        id_number = str(event["id"])
         if id_number not in id_list:
             return {
                 'statusCode': 400,
-                'body': f"The ID {id_number} you requested is not in the problems table"
+                'body': f"The ID {id_number} you requested is not in the problems table."
             }
         search_list.append(f'id = {event["id"]}')
-        
     if "problem_type" in event:
         problem_type_list = ['Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', 'Other']
         if event['problem_type'] not in problem_type_list:

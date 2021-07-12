@@ -190,7 +190,7 @@ Resources:
       FunctionName: CloudFormation-UpdateLambda
       CodeUri: s3://update-lambda-bucket/update-lambda.zip
       Runtime: python3.8
-      Handler: UpdateLambda.lambda_handler
+      Handler: UpdateProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
@@ -200,7 +200,7 @@ Resources:
       FunctionName: CloudFormation-LogLambda
       CodeUri: s3://log-lambda-bucket/log-lambda.zip
       Runtime: python3.8
-      Handler: LogLambda.lambda_handler
+      Handler: LogProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
