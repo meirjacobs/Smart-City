@@ -204,6 +204,16 @@ Resources:
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
+  deleteProblem:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-DeleteProblem
+      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
+      Runtime: python3.8
+      Handler: DeleteProblemLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
   mySNS:
     Type: AWS::SNS::Topic
     Properties:
@@ -251,7 +261,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-CreateTables
-      CodeUri: s3://create-tables-lambda-bucket/CreateTablesLambda.zip
+      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
       Runtime: python3.8
       Handler: CreateTablesLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
