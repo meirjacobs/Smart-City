@@ -57,11 +57,11 @@ def lambda_handler(event, context):
 
     # connect to MySQL
     sm_client = boto3.client("secretsmanager")
-    secret = sm_client.get_secret_value(SecretId='test/MySQL')
+    secret = sm_client.get_secret_value(SecretId='MySQL-Credentials')
     credentials = json.loads(secret['SecretString'])
     mydb = mysql.connector.connect(
         host=credentials['host'],
-        user=credentials['user'],
+        user=credentials['username'],
         password=credentials['password'],
         database=credentials['dbname']
     )
@@ -70,7 +70,10 @@ def lambda_handler(event, context):
     # get id number
     mycursor.execute(f"SHOW CREATE TABLE problems")
     id_number = mycursor.fetchall()[0][1]
-    id_number = int(id_number[486:-51])
+    if len(id_number) == 521:
+        id_number = 1
+    else:
+        id_number = int(id_number[486:-51])
 
     # upload images to new folder in S3 Bucket
     counter = 0

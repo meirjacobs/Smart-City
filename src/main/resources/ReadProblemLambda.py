@@ -7,11 +7,11 @@ def lambda_handler(event, context):
     
     # connect to MySQL
     sm_client = boto3.client("secretsmanager")
-    secret = sm_client.get_secret_value(SecretId='test/MySQL')
+    secret = sm_client.get_secret_value(SecretId='MySQL-Credentials')
     credentials = json.loads(secret['SecretString'])
     mydb = mysql.connector.connect(
         host=credentials['host'],
-        user=credentials['user'],
+        user=credentials['username'],
         password=credentials['password'],
         database=credentials['dbname']
     )

@@ -127,7 +127,7 @@ Resources:
             - arn:aws:lambda:*:*:function:*
             - !GetAtt SmartCityS3Bucket.Arn
             - arn:*:logs:*:*:*
-            - arn:aws:secretsmanager:us-east-1:287420233372:secret:test/MySQL-BG5WM0
+            - !Ref mySecret
           - Effect: Allow
             Action:
             - sns:*
@@ -147,7 +147,7 @@ Resources:
           Properties:
             Topic: !Ref mySNS
             SqsSubscription: false
-      CodeUri: s3://write-lambda-bucket/write-lambda.zip
+      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
       Runtime: python3.8
       Handler: WriteProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -158,7 +158,7 @@ Resources:
     Properties:
       FunctionName: CloudFormation-SmartCityReadLambda
       Events:
-      CodeUri: s3://read-lambda-bucket/read-lambda.zip
+      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
       Runtime: python3.8
       Handler: ReadProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -168,7 +168,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-AddEmployee
-      CodeUri: s3://add-employee-lambda-bucket/add-employee-lambda.zip
+      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
       Runtime: python3.8
       Handler: AddEmployeeLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -178,7 +178,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-DeleteEmployee
-      CodeUri: s3://delete-employee-lambda-bucket/delete-employee-lambda.zip
+      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
       Runtime: python3.8
       Handler: DeleteEmployeeLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -188,7 +188,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-UpdateLambda
-      CodeUri: s3://update-lambda-bucket/update-lambda.zip
+      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
       Runtime: python3.8
       Handler: UpdateProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -198,7 +198,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-LogLambda
-      CodeUri: s3://log-lambda-bucket/log-lambda.zip
+      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
       Runtime: python3.8
       Handler: LogProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -223,3 +223,45 @@ Resources:
     Properties:
       LayerName: smartCityS3Layer
       ContentUri: s3://mysql-layer/python.zip
+  mySecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: MySQL-Credentials
+      Description: "This secret has creates the credentials for MySQL with a dynamically generated secret password."
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "admin", "dbname": "Smart_City"}'
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: '\/@"'
+  myDB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 5
+      DBInstanceClass: db.t2.micro
+      Engine: mysql
+      MasterUsername: !Join [ '', [ '{{resolve:secretsmanager:', !Ref mySecret, ':SecretString:username}}' ] ]
+      MasterUserPassword: !Join [ '', [ '{{resolve:secretsmanager:', !Ref mySecret, ':SecretString:password}}' ] ]
+  mySecretHost:
+    Type: "AWS::SecretsManager::SecretTargetAttachment"
+    Properties:
+      SecretId: !Ref mySecret
+      TargetId: !Ref myDB
+      TargetType: AWS::RDS::DBInstance
+  CreateTables:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-CreateTables
+      CodeUri: s3://create-tables-lambda-bucket/CreateTablesLambda.zip
+      Runtime: python3.8
+      Handler: CreateTablesLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref myLayer
+  TableCreator:
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+      ServiceToken: !GetAtt CreateTables.Arn
+    DependsOn:
+      - myDB
+      - mySecret
+      - mySecretHost
