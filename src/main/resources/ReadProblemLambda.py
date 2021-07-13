@@ -33,6 +33,7 @@ def lambda_handler(event, context):
                 'body': f"The ID {id_number} you requested is not in the problems table."
             }
         search_list.append(f'id = {event["id"]}')
+        
     if "problem_type" in event:
         problem_type_list = ['Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', 'Other']
         if event['problem_type'] not in problem_type_list:
