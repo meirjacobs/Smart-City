@@ -8,7 +8,8 @@ Prerequisites:
 - AWS Account with appropriate permissions and sufficient credits.
 - Maybe more?
 
-1. Navigate to [S3](s3.console.aws.amazon.com/s3/home?) and select 'Create bucket'.
+Steps:
+1. Navigate to [S3](s3.console.aws.amazon.com/s3/home?) and select 'Create bucket'.  
   Name the bucket ---, scroll down to the bottom of the page and click 'Create bucket'. Repeat this process with a bucket name of ---.
   Download [all-lambdas.zip](https://github.com/meirjacobs/Smart-City/blob/main/src/main/resources/all-lambdas.zip) and put it the --- bucket.
   Download [mysql_layer_zip.zip](https://github.com/meirjacobs/Smart-City/tree/main/src/main/dependencies/mysql_layer/mysql_layer_zip.zip) and put it in the --- bucket.
