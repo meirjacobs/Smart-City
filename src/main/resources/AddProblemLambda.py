@@ -71,11 +71,11 @@ def lambda_handler(event, context):
         file_name = f'img{counter}.jpg'
         lambda_path = f'{id_number}/{file_name}'
         img = base64.b64decode(jsonbody["image_path"][counter])
-        s3_client.put_object(Bucket="smartcitys3bucket", Key=lambda_path, Body=img)
+        s3_client.put_object(Bucket="smart-city-s3-bucket", Key=lambda_path, Body=img)
         counter += 1
 
     # prepare and insert problem into problems table
-    image_path = f'https://s3.console.aws.amazon.com/s3/buckets/smartcitys3bucket?region=us-east-1&prefix={id_number}/'
+    image_path = f'https://s3.console.aws.amazon.com/s3/buckets/smart-city-s3-bucket?region=us-east-1&prefix={id_number}/'
 
     insert = "INSERT INTO problems (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
     val = (jsonbody["problem_type"], jsonbody["problem_description"], jsonbody["location"][1], jsonbody["location"][0],

@@ -94,7 +94,7 @@ def lambda_handler(event, context):
             mycursor.execute(f'UPDATE employees SET current_assignment_id = NULL where id = {employee_id}')
             lambda_client = boto3.client('lambda')
             lambda_client.invoke(
-                FunctionName='arn:aws:lambda:us-east-1:287420233372:function:DeleteLambda',
+                FunctionName='CloudFormation-DeleteLambda',
                 InvocationType='Event',
                 Payload=json.dumps(id_to_delete)
             )
@@ -107,7 +107,7 @@ def lambda_handler(event, context):
         # updating status to Complete
         if event["current_status"] == 'Complete':
             lambda_client.invoke(
-                FunctionName='arn:aws:lambda:us-east-1:287420233372:function:DeleteLambda',
+                FunctionName='CloudFormation-DeleteLambda',
                 InvocationType='Event',
                 Payload=json.dumps(id_to_delete)
             )
@@ -124,7 +124,7 @@ def lambda_handler(event, context):
     
     # insert log to logs_history
     lambda_client.invoke(
-        FunctionName='arn:aws:lambda:us-east-1:287420233372:function:LogLambda',
+        FunctionName='CloudFormation-LogLambda',
         InvocationType='Event',
         Payload=json.dumps(event)
     )

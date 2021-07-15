@@ -6,7 +6,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: BucketOwnerFullControl
-      BucketName: smartcitys3bucket
+      BucketName: smart-city-s3-bucket
   SmartCityS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -23,15 +23,15 @@ Resources:
                 - !Ref SmartCityS3Bucket
                 - /*
             Principal: '*'
-  smartCityAPIGateway:
+  SmartCityAPIGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Description: Smart City API Gateway
-      Name: smartCityAPIGateway
+      Name: SmartCityAPIGateway
       EndpointConfiguration:
         Types:
           - EDGE
-  apiGatewayPost:
+  ApiGatewayPost:
     Type: AWS::ApiGateway::Method
     Properties:
       AuthorizationType: NONE
@@ -44,9 +44,9 @@ Resources:
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
           - lambdaArn: !GetAtt AddProblem.Arn
-      ResourceId: !GetAtt smartCityAPIGateway.RootResourceId
-      RestApiId: !Ref smartCityAPIGateway
-  apiGatewayGet:
+      ResourceId: !GetAtt SmartCityAPIGateway.RootResourceId
+      RestApiId: !Ref SmartCityAPIGateway
+  ApiGatewayGet:
     Type: AWS::ApiGateway::Method
     Properties:
       AuthorizationType: NONE
@@ -75,15 +75,15 @@ Resources:
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
           - lambdaArn: !GetAtt ReadProblem.Arn
-      ResourceId: !GetAtt smartCityAPIGateway.RootResourceId
-      RestApiId: !Ref smartCityAPIGateway
-  apiGatewayDeployment:
+      ResourceId: !GetAtt SmartCityAPIGateway.RootResourceId
+      RestApiId: !Ref SmartCityAPIGateway
+  ApiGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
-      - apiGatewayPost
-      - apiGatewayGet
+      - ApiGatewayPost
+      - ApiGatewayGet
     Properties:
-      RestApiId: !Ref smartCityAPIGateway
+      RestApiId: !Ref SmartCityAPIGateway
       StageName: deployedStage
   APILambdaPostPermission:
     Type: "AWS::Lambda::Permission"
@@ -127,7 +127,8 @@ Resources:
             - arn:aws:lambda:*:*:function:*
             - !GetAtt SmartCityS3Bucket.Arn
             - arn:*:logs:*:*:*
-            - !Ref mySecret
+            - !Ref MySQLSecret
+            - !Ref EmailSecret
   AddProblem:
     Type: AWS::Serverless::Function
     Properties:
@@ -140,7 +141,7 @@ Resources:
       Handler: WriteProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
-        - !Ref myLayer
+        - !Ref MySQLLayer
   ReadProblem:
     Type: AWS::Serverless::Function
     Properties:
@@ -151,7 +152,7 @@ Resources:
       Handler: ReadProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
-        - !Ref myLayer
+        - !Ref MySQLLayer
   AddEmployee:
     Type: AWS::Serverless::Function
     Properties:
@@ -161,7 +162,7 @@ Resources:
       Handler: AddEmployeeLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
-        - !Ref myLayer
+        - !Ref MySQLLayer
   DeleteEmployee:
     Type: AWS::Serverless::Function
     Properties:
@@ -171,7 +172,7 @@ Resources:
       Handler: DeleteEmployeeLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
-        - !Ref myLayer
+        - !Ref MySQLLayer
   UpdateLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -181,7 +182,7 @@ Resources:
       Handler: UpdateProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
-        - !Ref myLayer
+        - !Ref MySQLLayer
   LogLambda:
     Type: AWS::Serverless::Function
     Properties:
@@ -191,7 +192,7 @@ Resources:
       Handler: LogProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
-        - !Ref myLayer
+        - !Ref MySQLLayer
   DeleteProblem:
     Type: AWS::Serverless::Function
     Properties:
@@ -201,7 +202,7 @@ Resources:
       Handler: DeleteProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
-        - !Ref myLayer
+        - !Ref MySQLLayer
   Emailer:
     Type: AWS::Serverless::Function
     Properties:
@@ -210,10 +211,10 @@ Resources:
       Runtime: python3.8
       Handler: EmailerLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
-  myLayer:
+  MySQLLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: smartCityS3Layer
+      LayerName: CloudFormation-MySQL_Layer
       ContentUri: s3://mysql-layer/python.zip
   MySQLSecret:
     Type: AWS::SecretsManager::Secret
@@ -230,7 +231,7 @@ Resources:
     Properties:
       Name: Email-Credentials
       Description: "This is an empty secret which the user must fill in with credentials to the email address which they wish to send emails from."
-  myDB:
+  SmartCityDB:
     Type: AWS::RDS::DBInstance
     Properties:
       AllocatedStorage: 5
@@ -242,7 +243,7 @@ Resources:
     Type: "AWS::SecretsManager::SecretTargetAttachment"
     Properties:
       SecretId: !Ref MySQLSecret
-      TargetId: !Ref myDB
+      TargetId: !Ref SmartCityDB
       TargetType: AWS::RDS::DBInstance
   CreateTables:
     Type: AWS::Serverless::Function
@@ -253,12 +254,12 @@ Resources:
       Handler: CreateTablesLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
-        - !Ref myLayer
+        - !Ref MySQLLayer
   TableCreator:
     Type: AWS::CloudFormation::CustomResource
     Properties:
       ServiceToken: !GetAtt CreateTables.Arn
     DependsOn:
-      - myDB
+      - SmartCityDB
       - MySQLSecret
       - MySQLSecretHost
