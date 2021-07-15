@@ -231,6 +231,8 @@ Resources:
     Properties:
       Name: Email-Credentials
       Description: "This is an empty secret which the user must fill in with credentials of the email address which they wish to send emails from."
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": ".", "password": "."}'
   SmartCityDB:
     Type: AWS::RDS::DBInstance
     Properties:
