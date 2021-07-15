@@ -1,5 +1,8 @@
 import json
+
 import boto3
+import urllib3
+
 import mysql.connector
 
 def lambda_handler(event, context):
@@ -27,9 +30,22 @@ def lambda_handler(event, context):
         }
         
     if "email" not in event or not isinstance(event["email"], str):
-            return {
+        return {
             'statusCode': 400,
             'body': "'email' is a required field and must be of type string"
+        }
+    http = urllib3.PoolManager()
+    email_address = event["email"]
+    response = http.request(
+        "GET",
+        "https://isitarealemail.com/api/email/validate",
+        fields = {'email': email_address}
+    )
+    status = json.loads(response.data)['status']
+    if status != "valid":
+        return {
+            'statusCode': 400,
+            'body': "The email you entered was not valid. Please try again."
         }
    
     department_list = ['Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', 'Other']
@@ -50,6 +66,15 @@ def lambda_handler(event, context):
         database=credentials['dbname']
     )
     mycursor = mydb.cursor()
+
+    # ensure email is unique within database
+    mycursor.execute(f'SELECT * FROM employees WHERE email = "{event["email"]}"')
+    present = mycursor.fetchall()
+    if present:
+        return {
+            'statusCode': 400,
+            'body': "The email you entered already exists in this table."
+        }
     
     # insert employee into employees table
     insert = "INSERT INTO employees (first_name, last_name, email, department) VALUES (%s, %s, %s, %s)"

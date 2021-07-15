@@ -1,7 +1,9 @@
 import json
 import logging
+
 import urllib3
 import boto3
+
 import mysql.connector
 
 logger = logging.getLogger()

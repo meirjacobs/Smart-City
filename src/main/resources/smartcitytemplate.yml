@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: Deploys Smart City API Gateway with Lambda integrations
+Description: "Deploys Smart-City containing: API Gateway with Lambda integrations, MySQL database with tables, and credentials from SecretsManager. For more information see our project at https://github.com/meirjacobs/Smart-City"
 Resources:
   SmartCityS3Bucket:
     Type: AWS::S3::Bucket
@@ -43,7 +43,7 @@ Resources:
         Type: AWS_PROXY
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
-          - lambdaArn: !GetAtt smartCityWrite.Arn
+          - lambdaArn: !GetAtt AddProblem.Arn
       ResourceId: !GetAtt smartCityAPIGateway.RootResourceId
       RestApiId: !Ref smartCityAPIGateway
   apiGatewayGet:
@@ -74,7 +74,7 @@ Resources:
           integration.request.querystring.image_path: method.request.querystring.image_path
         Uri: !Sub
           - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
-          - lambdaArn: !GetAtt smartCityRead.Arn
+          - lambdaArn: !GetAtt ReadProblem.Arn
       ResourceId: !GetAtt smartCityAPIGateway.RootResourceId
       RestApiId: !Ref smartCityAPIGateway
   apiGatewayDeployment:
@@ -89,13 +89,13 @@ Resources:
     Type: "AWS::Lambda::Permission"
     Properties:
       Action: "lambda:InvokeFunction"
-      FunctionName: !Ref smartCityWrite
+      FunctionName: !Ref AddProblem
       Principal: "apigateway.amazonaws.com"
   APILambdaGetPermission:
     Type: "AWS::Lambda::Permission"
     Properties:
       Action: "lambda:InvokeFunction"
-      FunctionName: !Ref smartCityRead
+      FunctionName: !Ref ReadProblem
       Principal: "apigateway.amazonaws.com"
   SmartCityLambdaRole:
     Type: AWS::IAM::Role
@@ -128,35 +128,23 @@ Resources:
             - !GetAtt SmartCityS3Bucket.Arn
             - arn:*:logs:*:*:*
             - !Ref mySecret
-          - Effect: Allow
-            Action:
-            - sns:*
-            Resource:
-            - "*"
-  smartCityWrite:
+  AddProblem:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: CloudFormation-SmartCityWriteLambda
+      FunctionName: CloudFormation-AddProblem
       Environment:
         Variables:
           BUCKET_NAME: !Ref SmartCityS3Bucket
-          SNS_TOPIC: !Ref mySNS
-      Events:
-        SNSEvent:
-          Type: SNS
-          Properties:
-            Topic: !Ref mySNS
-            SqsSubscription: false
       CodeUri: s3://smart-city-lambdas/all-lambdas.zip
       Runtime: python3.8
       Handler: WriteProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
-  smartCityRead:
+  ReadProblem:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: CloudFormation-SmartCityReadLambda
+      FunctionName: CloudFormation-ReadProblem
       Events:
       CodeUri: s3://smart-city-lambdas/all-lambdas.zip
       Runtime: python3.8
@@ -164,7 +152,7 @@ Resources:
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
-  addEmployee:
+  AddEmployee:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-AddEmployee
@@ -174,7 +162,7 @@ Resources:
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
-  deleteEmployee:
+  DeleteEmployee:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-DeleteEmployee
@@ -184,7 +172,7 @@ Resources:
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
-  updateLambda:
+  UpdateLambda:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-UpdateLambda
@@ -194,7 +182,7 @@ Resources:
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
-  logLambda:
+  LogLambda:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-LogLambda
@@ -204,7 +192,7 @@ Resources:
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
-  deleteProblem:
+  DeleteProblem:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-DeleteProblem
@@ -214,26 +202,20 @@ Resources:
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref myLayer
-  mySNS:
-    Type: AWS::SNS::Topic
+  Emailer:
+    Type: AWS::Serverless::Function
     Properties:
-      DisplayName: SmartCitySNS
-      TopicName: SmartCitySNS
-      Subscription:
-      - Endpoint: smartcitysns@gmail.com
-        Protocol: email
-  EmailSNSSubscription:
-    Type: AWS::SNS::Subscription
-    Properties:
-      Endpoint: smartcitysns@gmail.com
-      Protocol: email
-      TopicArn: !Ref mySNS
+      FunctionName: CloudFormation-Emailer
+      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
+      Runtime: python3.8
+      Handler: EmailerLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
   myLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: smartCityS3Layer
       ContentUri: s3://mysql-layer/python.zip
-  mySecret:
+  MySQLSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: MySQL-Credentials
@@ -243,18 +225,23 @@ Resources:
         GenerateStringKey: "password"
         PasswordLength: 16
         ExcludeCharacters: '\/@"'
+  EmailSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: Email-Credentials
+      Description: "This is an empty secret which the user must fill in with credentials to the email address which they wish to send emails from."
   myDB:
     Type: AWS::RDS::DBInstance
     Properties:
       AllocatedStorage: 5
       DBInstanceClass: db.t2.micro
       Engine: mysql
-      MasterUsername: !Join [ '', [ '{{resolve:secretsmanager:', !Ref mySecret, ':SecretString:username}}' ] ]
-      MasterUserPassword: !Join [ '', [ '{{resolve:secretsmanager:', !Ref mySecret, ':SecretString:password}}' ] ]
-  mySecretHost:
+      MasterUsername: !Join [ '', [ '{{resolve:secretsmanager:', !Ref MySQLSecret, ':SecretString:username}}' ] ]
+      MasterUserPassword: !Join [ '', [ '{{resolve:secretsmanager:', !Ref MySQLSecret, ':SecretString:password}}' ] ]
+  MySQLSecretHost:
     Type: "AWS::SecretsManager::SecretTargetAttachment"
     Properties:
-      SecretId: !Ref mySecret
+      SecretId: !Ref MySQLSecret
       TargetId: !Ref myDB
       TargetType: AWS::RDS::DBInstance
   CreateTables:
@@ -273,5 +260,5 @@ Resources:
       ServiceToken: !GetAtt CreateTables.Arn
     DependsOn:
       - myDB
-      - mySecret
-      - mySecretHost
+      - MySQLSecret
+      - MySQLSecretHost

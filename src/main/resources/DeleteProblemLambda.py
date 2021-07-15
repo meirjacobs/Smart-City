@@ -1,5 +1,7 @@
 import json
+
 import boto3
+
 import mysql.connector
 
 def lambda_handler(event, context):
@@ -37,5 +39,5 @@ def lambda_handler(event, context):
     else:
         return {
             'statusCode': 200,
-            'body': f"ID {id} deleted succesfully"
+            'body': f"ID {id_number} deleted succesfully"
         }

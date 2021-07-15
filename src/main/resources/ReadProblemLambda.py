@@ -1,6 +1,8 @@
 import datetime
 import json
+
 import boto3
+
 import mysql.connector
 
 def lambda_handler(event, context):
@@ -96,7 +98,7 @@ def lambda_handler(event, context):
                 'statusCode': 400,
                 'body': "'distance' must be a number that is at least 0"
             }
-        search_list.append(f'ST_Distance_Sphere(point({event["location"][1]}, {event["location"][0]}), location) <= {event["distance"]}')
+        search_list.append(f'ST_Distance_Sphere(point({event["location"][1]}, {event["location"][0]}), location) <= {event["distance"] * 1000}')
 
     if "distance" in event and "location" not in event:
         return {
