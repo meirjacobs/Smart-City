@@ -1,5 +1,6 @@
 package com.smartcity.smartcity;
 
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -13,7 +14,11 @@ import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.Scanner;
 
 @org.springframework.stereotype.Controller
@@ -25,28 +30,73 @@ public class SmartCityController {
         return "HomePage";
     }
 
-    public class ReportData {
-        private String body;
+    public class PostData {
+        private String problemType;
+        private String latitude;
+        private String longitude;
+        private String problemDescription;
+        private File encodedImage;
 
-        public void setData(String bodyTxt) {
-            body = bodyTxt;
+        public String getProblemType() {
+            return problemType;
         }
 
-        public String getData() {
-            return body;
+        public void setProblemType(String problemType) {
+            this.problemType = problemType;
+        }
+
+        public String getLongitude() {
+            return longitude;
+        }
+
+        public void setLongitude(String longitude) {
+            this.longitude = longitude;
+        }
+
+        public String getLatitude() {
+            return latitude;
+        }
+
+        public void setLatitude(String latitude) {
+            this.latitude = latitude;
+        }
+
+        public File getEncodedImage() {
+            return encodedImage;
+        }
+
+        public void setEncoded_image(File encodedImage) {
+            this.encodedImage = encodedImage;
+        }
+
+        public String getProblemDescription() {
+            return problemDescription;
+        }
+
+        public void setProblemDescription(String problemDescription) {
+            this.problemDescription = problemDescription;
         }
     }
 
     @PostMapping("/report")
-    public String showPage(@ModelAttribute("data") ReportData body) {
+    public String showPage(@ModelAttribute("data") PostData body) throws IOException {
 
-        System.out.println("Data: " + body.getData()); //in reality, you'd use a logger instead :)
+        System.out.println("Problem Type: " + body.getProblemType());
+        System.out.println("Problem Description: " + body.getProblemDescription());
+        System.out.println("Latitude: " + body.getLatitude());
+        System.out.println("Longitude: " + body.getLongitude());
+        /*byte[] fileContent = Files.readAllBytes(body.getEncodedImage().toPath());
+        String encodedString = Base64
+                .getEncoder()
+                .encodeToString(fileContent);
+        System.out.println("Image: " + encodedString);*/
+        System.out.println("Encoded Image: " + body.getEncodedImage());
         return "ReportPage";
     }
 
     @GetMapping("/report")
     public String getReportPage(Model model) throws FileNotFoundException {
-        model.addAttribute("data", new ReportData()); //assume SomeBean has a property called datePlanted
+        model.addAttribute("data", new PostData()); //assume SomeBean has a property called datePlanted
 
         /*WebClient client = WebClient.create("https://x1vj5n9ki4.execute-api.us-east-1.amazonaws.com/deployedStage");
         WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.method(HttpMethod.POST);

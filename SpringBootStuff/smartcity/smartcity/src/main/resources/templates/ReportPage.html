@@ -16,13 +16,13 @@
             font-family: monospace;
             margin-top: 5px;
         }
-        button {
+        #submit {
             padding: 20px;
             margin: 10px;
             background-color: rgb(255, 255, 210);
             border-radius: 10px;
         }
-        button:hover {
+        #submit:hover {
             cursor: pointer;
             background-color: rgb(230, 230, 190);
         }
@@ -36,7 +36,7 @@
 <div>Thank you for taking the time to report an issue. Please fill out all fields:</div>
 <form th:action="@{/report}" th:object="${data}" method="post">
 <div>Problem Type:
-    <select id="type">
+    <select name="problemType">
         <option value="Road Hazard">Road Hazard</option>
         <option value="Criminal Act">Criminal Act</option>
         <option value="Environmental Hazard">Environmental Hazard</option>
@@ -45,12 +45,10 @@
         <option value="Water Damage">Water Damage</option>
         <option value="Other">Other</option>
     </select></div>
-<div>Location: <input id="latitude" placeholder="Latitude">, <input id="longitude" placeholder="Longitude"></div>
-<div>Problem Description: <input id="description"></div>
-<!--<div>Base-64 Encoded Image: <input></div>-->
-<div>Image: <input id="image" type="file"></div>
-<input type="submit">
+<div>Location: <input name="latitude" placeholder="Latitude">, <input name="longitude" id="longitude" placeholder="Longitude"></div>
+<div>Problem Description: <input name="problemDescription"></div>
+<div>Image: <input name="encodedImage" type="file"></div>
+<div id="button-container"><input id="submit" type="submit"></div>
 </form>
-<div id="button-container"><button>Submit Report</button></div>
 </body>
 </html>
