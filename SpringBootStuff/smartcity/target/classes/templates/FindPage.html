@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Find Issue</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        body {
+            background-color: rgb(210, 255, 200);
+        }
+        #header {
+            font-family: sans-serif;
+            color: blue;
+            text-align: center;
+        }
+        div, input, select {
+            font-family: monospace;
+            margin-top: 5px;
+        }
+        button {
+            padding: 20px;
+            margin: 10px;
+            background-color: rgb(255, 255, 210);
+            border-radius: 10px;
+        }
+        button:hover {
+            cursor: pointer;
+            background-color: rgb(230, 230, 190);
+        }
+        #button-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<h1 id="header">Find Issue</h1>
+<div>Please fill out at least one field:</div>
+<div> Issue ID #: <input></div>
+<form>
+<div>Problem Type:
+    <select>
+        <option value="Any">Any</option>
+        <option value="Road Hazard">Road Hazard</option>
+        <option value="Criminal Act">Criminal Act</option>
+        <option value="Environmental Hazard">Environmental Hazard</option>
+        <option value="Vehicle Damage">Vehicle Damage</option>
+        <option value="Fire">Fire</option>
+        <option value="Water Damage">Water Damage</option>
+        <option value="Other">Other</option>
+    </select></div>
+<div>Location: Within <input placeholder="Distance in km"> of <input placeholder="Latitude">, <input placeholder="Longitude"></div>
+<div>Problem Description: <input></div>
+<!--<div>Base-64 Encoded Image: <input></div>-->
+<div>Image: <input type="file"></div>
+<div>Current Status:
+    <select>
+        <option value="Any">Any</option>
+        <option value="Open">Open</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Complete">Complete</option>
+    </select>
+</div>
+<div>Time Reported: Between <input type="datetime-local"> and <input type="datetime-local"></div>
+</form>
+<div id="button-container"><button>Find Issue</button></div>
+</body>
+</html>

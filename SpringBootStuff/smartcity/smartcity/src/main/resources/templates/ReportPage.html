@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Report Issue</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        body {
+            background-color: rgb(210, 255, 200);
+        }
+        #header {
+            font-family: sans-serif;
+            color: blue;
+            text-align: center;
+        }
+        div, input, select {
+            font-family: monospace;
+            margin-top: 5px;
+        }
+        button {
+            padding: 20px;
+            margin: 10px;
+            background-color: rgb(255, 255, 210);
+            border-radius: 10px;
+        }
+        button:hover {
+            cursor: pointer;
+            background-color: rgb(230, 230, 190);
+        }
+        #button-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<h1 id="header">Report Issue</h1>
+<div>Thank you for taking the time to report an issue. Please fill out all fields:</div>
+<form th:action="@{/report}" th:object="${data}" method="post">
+<div>Problem Type:
+    <select id="type">
+        <option value="Road Hazard">Road Hazard</option>
+        <option value="Criminal Act">Criminal Act</option>
+        <option value="Environmental Hazard">Environmental Hazard</option>
+        <option value="Vehicle Damage">Vehicle Damage</option>
+        <option value="Fire">Fire</option>
+        <option value="Water Damage">Water Damage</option>
+        <option value="Other">Other</option>
+    </select></div>
+<div>Location: <input id="latitude" placeholder="Latitude">, <input id="longitude" placeholder="Longitude"></div>
+<div>Problem Description: <input id="description"></div>
+<!--<div>Base-64 Encoded Image: <input></div>-->
+<div>Image: <input id="image" type="file"></div>
+<input type="submit">
+</form>
+<div id="button-container"><button>Submit Report</button></div>
+</body>
+</html>
