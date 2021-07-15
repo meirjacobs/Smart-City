@@ -173,20 +173,20 @@ Resources:
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref MySQLLayer
-  UpdateLambda:
+  UpdateProblem:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: CloudFormation-UpdateLambda
+      FunctionName: CloudFormation-UpdateProblem
       CodeUri: s3://smart-city-lambdas/all-lambdas.zip
       Runtime: python3.8
       Handler: UpdateProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref MySQLLayer
-  LogLambda:
+  LogProblem:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: CloudFormation-LogLambda
+      FunctionName: CloudFormation-LogProblem
       CodeUri: s3://smart-city-lambdas/all-lambdas.zip
       Runtime: python3.8
       Handler: LogProblemLambda.lambda_handler
@@ -220,7 +220,7 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: MySQL-Credentials
-      Description: "This secret has creates the credentials for MySQL with a dynamically generated secret password."
+      Description: "This secret creates the credentials for MySQL with a dynamically generated secret password."
       GenerateSecretString:
         SecretStringTemplate: '{"username": "admin", "dbname": "Smart_City"}'
         GenerateStringKey: "password"
@@ -230,7 +230,7 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: Email-Credentials
-      Description: "This is an empty secret which the user must fill in with credentials to the email address which they wish to send emails from."
+      Description: "This is an empty secret which the user must fill in with credentials of the email address which they wish to send emails from."
   SmartCityDB:
     Type: AWS::RDS::DBInstance
     Properties:
