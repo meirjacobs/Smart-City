@@ -215,7 +215,7 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: CloudFormation-MySQL_Layer
-      ContentUri: s3://mysql-layer/python.zip
+      ContentUri: s3://mysql-layer/mysql_layer_zip.zip
   MySQLSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
