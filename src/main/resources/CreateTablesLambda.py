@@ -67,8 +67,8 @@ def create_tables():
     logs_result = mycursor.fetchall()[0][0]
     if problems_result == None or employees_result == None or logs_result == None:
         return {"Data": "Error: Tables were not created"}
-    
-    return {"Data": "Success! Schema and tables were created"}
+    else:
+        return {"Data": "Success! Schema and tables were created"}
 
 # cfnresponse module source code taken from (with some slight alterations): https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-lambda-function-code-cfnresponsemodule.html
 http = urllib3.PoolManager()

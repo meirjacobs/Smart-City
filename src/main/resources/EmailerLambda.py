@@ -11,7 +11,8 @@ def lambda_handler(event, context):
     sm_client = boto3.client("secretsmanager")
     secret = sm_client.get_secret_value(SecretId='Email-Credentials')
     credentials = json.loads(secret['SecretString'])
-    
+
+    # send email    
     msg = EmailMessage()
     msg['Subject'] = event["subject"]
     msg['From'] = credentials['username']
