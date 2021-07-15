@@ -4,7 +4,9 @@ Code repository for the Smart City team for Yeshiva University's Industrial Soft
 
 ## Steps for Deployment
 
-- Prerequisite: AWS Account with appropriate permissions and sufficient credits.
+Prerequisites: 
+- AWS Account with appropriate permissions and sufficient credits.
+- Maybe more?
 
 1. Navigate to [S3](s3.console.aws.amazon.com/s3/home?) and select 'Create bucket'.
   Name the bucket ---, scroll down to the bottom of the page and click 'Create bucket'. Repeat this process with a bucket name of ---.
