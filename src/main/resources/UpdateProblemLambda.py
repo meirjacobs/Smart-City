@@ -6,6 +6,13 @@ import mysql.connector
 
 def lambda_handler(event, context):
     
+    # check input to ensure it is valid
+    if len(event) != 3:
+        return {
+            'statusCode': 400,
+            'body': f'Three items requires. Received {len(event)}. \n Input: {json.dumps(event)}'
+        }
+
     # connect to MySQL
     sm_client = boto3.client("secretsmanager")
     secret = sm_client.get_secret_value(SecretId='MySQL-Credentials')
@@ -47,7 +54,7 @@ def lambda_handler(event, context):
             'body': "'current_status' must be set to 'Open', 'In Progress', or 'Complete'"
         }
 
-    # prepare event variable for LogLambda & next validation
+    # prepare event variable for LogProblem & next validation
     mycursor.execute(f"SELECT * FROM problems WHERE id = {id_number}")
     data = mycursor.fetchall()[0]
     event["id_number"] = data[0]
@@ -64,7 +71,7 @@ def lambda_handler(event, context):
     event["assigned_employee_id"] = employee_id
     
     if event['current_status'] == event['previous_status']:
-      return {
+        return {
             'statusCode': 400,
             'body': "'current_status' must not be the same as 'previous_status'"
         }
@@ -94,7 +101,7 @@ def lambda_handler(event, context):
             mycursor.execute(f'UPDATE employees SET current_assignment_id = NULL where id = {employee_id}')
             lambda_client = boto3.client('lambda')
             lambda_client.invoke(
-                FunctionName='CloudFormation-DeleteLambda',
+                FunctionName='CloudFormation-DeleteProblem',
                 InvocationType='Event',
                 Payload=json.dumps(id_to_delete)
             )
@@ -107,7 +114,7 @@ def lambda_handler(event, context):
         # updating status to Complete
         if event["current_status"] == 'Complete':
             lambda_client.invoke(
-                FunctionName='CloudFormation-DeleteLambda',
+                FunctionName='CloudFormation-DeleteProblem',
                 InvocationType='Event',
                 Payload=json.dumps(id_to_delete)
             )
@@ -124,7 +131,7 @@ def lambda_handler(event, context):
     
     # insert log to logs_history
     lambda_client.invoke(
-        FunctionName='CloudFormation-LogLambda',
+        FunctionName='CloudFormation-LogProblem',
         InvocationType='Event',
         Payload=json.dumps(event)
     )

@@ -144,7 +144,7 @@ Resources:
         Bucket: !Ref ResourcesBucket
         Key: lambdas.zip
       Runtime: python3.8
-      Handler: WriteProblemLambda.lambda_handler
+      Handler: AddProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
         - !Ref MySQLLayer
@@ -252,7 +252,7 @@ Resources:
     Properties:
       Name: Email-Credentials
       Description: "This secret contains the credentials of the email address that sends the emails."
-      SecretString: !Join [ '', [ '{"username": ', !Ref EmailAddress, '"password": ', !Ref EmailPassword ] ]
+      SecretString: !Join [ '', [ '{"username": "', !Ref EmailAddress, '", ', '"password": "', !Ref EmailPassword, '"}' ] ]
   SmartCityDB:
     Type: AWS::RDS::DBInstance
     Properties:
