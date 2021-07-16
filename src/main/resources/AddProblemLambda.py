@@ -1,6 +1,7 @@
 import base64
 import datetime
 import json
+import os
 
 import boto3
 import botocore.config
@@ -65,17 +66,18 @@ def lambda_handler(event, context):
         id_number = int(id_number[486:-51])
 
     # upload images to new folder in S3 Bucket
+    bucket = os.environ["BUCKET_NAME"] # WARNING: TEST TO SEE WHAT THIS PRINTS AND UPDATE 76 & 80 ACCORDINGLY
     counter = 0
     s3_client = boto3.client('s3')
     for img in jsonbody["image_path"]:
         file_name = f'img{counter}.jpg'
         lambda_path = f'{id_number}/{file_name}'
         img = base64.b64decode(jsonbody["image_path"][counter])
-        s3_client.put_object(Bucket="smart-city-s3-bucket", Key=lambda_path, Body=img)
+        s3_client.put_object(Bucket=bucket, Key=lambda_path, Body=img)
         counter += 1
 
     # prepare and insert problem into problems table
-    image_path = f'https://s3.console.aws.amazon.com/s3/buckets/smart-city-s3-bucket?region=us-east-1&prefix={id_number}/'
+    image_path = f'https://s3.console.aws.amazon.com/s3/buckets/{bucket}?region=us-east-1&prefix={id_number}/'
 
     insert = "INSERT INTO problems (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
     val = (jsonbody["problem_type"], jsonbody["problem_description"], jsonbody["location"][1], jsonbody["location"][0],

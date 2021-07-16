@@ -6,18 +6,16 @@ Code repository for the Smart City team for Yeshiva University's Industrial Soft
 
 Prerequisites: 
 - AWS Account with appropriate permissions and sufficient credits.
+- Gmail account
 - Maybe more?
 
 Steps:
-1. Navigate to [S3](s3.console.aws.amazon.com/s3/home?) and select 'Create bucket'.  
-  Name the bucket ---, scroll down to the bottom of the page and click 'Create bucket'. Repeat this process with a bucket name of ---.  
-  Download [all-lambdas.zip](https://github.com/meirjacobs/Smart-City/blob/main/src/main/resources/all-lambdas.zip) and put it the --- bucket.  
-  Download [mysql_layer_zip.zip](https://github.com/meirjacobs/Smart-City/tree/main/src/main/dependencies/mysql_layer/mysql_layer_zip.zip) and put it in the --- bucket.
+1. Create an [S3 Bucket](s3.console.aws.amazon.com/s3/home?). Copy the name of the bucket for the next step.\
+Download [lambdas.zip](https://github.com/meirjacobs/Smart-City/tree/main/CloudFormation/lambdas.zip) and [mysql_layer.zip](https://github.com/meirjacobs/Smart-City/tree/main/CloudFormation/mysql_layer.zip) and add them to the bucket.
 
-2. Create an [AWS CloudFormation Stack](https://docs.aws.amazon.com/cloudformation/index.html) with the [Smart City template](https://github.com/meirjacobs/Smart-City/blob/main/src/main/resources/smartcitytemplate.yml).
+2. Create an [AWS CloudFormation Stack](https://docs.aws.amazon.com/cloudformation/index.html) with the [Smart City template](https://github.com/meirjacobs/Smart-City/blob/main/src/main/resources/smartcitytemplate.yml).\
+Follow the instructions in the 'Parameters' section.
 
-3. Navigate to [Secrets Manager](https://console.aws.amazon.com/secretsmanager/home?/listSecrets) and select 'Email-Credentials'.  
-  Scroll down to 'Secret value' and select 'Retrieve secret value'.  
-  Click 'edit' and update the field to the right of 'username' with the email address you wish to send emails from, and in the field to the right of the 'password' box with the password to the email.
+3. Wait about 10 minutes for the Stack to finish deploying.
 
 4. More steps to come soon iyH.

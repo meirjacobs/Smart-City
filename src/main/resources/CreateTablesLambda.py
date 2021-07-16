@@ -8,6 +8,7 @@ import mysql.connector
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
 def lambda_handler (event, context):
     try:
         request_type = event['RequestType']

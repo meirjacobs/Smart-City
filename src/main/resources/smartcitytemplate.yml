@@ -1,12 +1,20 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 Description: "Deploys Smart-City containing: API Gateway with Lambda integrations, MySQL database with tables, and credentials from SecretsManager. For more information see our project at https://github.com/meirjacobs/Smart-City"
+Parameters:
+  ResourcesBucket:
+    Type: String
+    Description: "Please enter the name of the S3 Bucket containing the resources."
+  EmailAddress:
+    Type: String
+    Description: "Please enter the username of the email address you wish to send emails from. Note: this must be a Gmail account"
+  EmailPassword:
+    Type: String
+    Description: "Please enter the password of the email address you wish to send emails from."
+    NoEcho: true
 Resources:
   SmartCityS3Bucket:
     Type: AWS::S3::Bucket
-    Properties:
-      AccessControl: BucketOwnerFullControl
-      BucketName: smart-city-s3-bucket
   SmartCityS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -17,11 +25,7 @@ Resources:
           - Action:
               - 's3:*'
             Effect: Allow
-            Resource: !Join
-              - ''
-              - - 'arn:aws:s3:::'
-                - !Ref SmartCityS3Bucket
-                - /*
+            Resource: !Join [ '', [ 'arn:aws:s3:::', !Ref SmartCityS3Bucket, '/*' ] ]
             Principal: '*'
   SmartCityAPIGateway:
     Type: AWS::ApiGateway::RestApi
@@ -136,7 +140,9 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: !Ref SmartCityS3Bucket
-      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
       Runtime: python3.8
       Handler: WriteProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -146,8 +152,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-ReadProblem
-      Events:
-      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
       Runtime: python3.8
       Handler: ReadProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -157,7 +164,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-AddEmployee
-      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
       Runtime: python3.8
       Handler: AddEmployeeLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -167,7 +176,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-DeleteEmployee
-      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
       Runtime: python3.8
       Handler: DeleteEmployeeLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -177,7 +188,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-UpdateProblem
-      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
       Runtime: python3.8
       Handler: UpdateProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -187,7 +200,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-LogProblem
-      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
       Runtime: python3.8
       Handler: LogProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -197,7 +212,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-DeleteProblem
-      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
       Runtime: python3.8
       Handler: DeleteProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -207,7 +224,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-Emailer
-      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
       Runtime: python3.8
       Handler: EmailerLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
@@ -215,7 +234,9 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: CloudFormation-MySQL_Layer
-      ContentUri: s3://mysql-layer/mysql_layer_zip.zip
+      ContentUri: 
+        Bucket: !Ref ResourcesBucket
+        Key: mysql_layer.zip
   MySQLSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
@@ -230,8 +251,8 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: Email-Credentials
-      Description: "This is an empty secret which the user must fill in with credentials of the email address which they wish to send emails from."
-      SecretString: '{"username": "Input Email Here", "password": "Input Password Here"}'
+      Description: "This secret contains the credentials of the email address that sends the emails."
+      SecretString: !Join [ '', [ '{"username": ', !Ref EmailAddress, '"password": ', !Ref EmailPassword ] ]
   SmartCityDB:
     Type: AWS::RDS::DBInstance
     Properties:
@@ -250,7 +271,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-CreateTables
-      CodeUri: s3://smart-city-lambdas/all-lambdas.zip
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
       Runtime: python3.8
       Handler: CreateTablesLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
