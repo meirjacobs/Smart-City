@@ -5,10 +5,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -19,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Base64;
+import java.util.List;
 import java.util.Scanner;
 
 @org.springframework.stereotype.Controller
@@ -35,7 +34,10 @@ public class SmartCityController {
         private String latitude;
         private String longitude;
         private String problemDescription;
-        private File encodedImage;
+        //private MultipartFile image;
+        //private String image;
+        private File image;
+        //private List<MultipartFile> image;
 
         public String getProblemType() {
             return problemType;
@@ -61,12 +63,36 @@ public class SmartCityController {
             this.latitude = latitude;
         }
 
-        public File getEncodedImage() {
-            return encodedImage;
+        /*public List<MultipartFile> getImage() {
+            return image;
         }
 
-        public void setEncoded_image(File encodedImage) {
-            this.encodedImage = encodedImage;
+        public void setImage(List<MultipartFile> encodedImage) {
+            this.image = image;
+        }*/
+
+        /*public MultipartFile getImage() {
+            return image;
+        }
+
+        public void setImage(MultipartFile encodedImage) {
+            this.image = image;
+        }*/
+
+        /*public String getImage() {
+            return image;
+        }
+
+        public void setImage(String encodedImage) {
+            this.image = image;
+        }*/
+
+        public File getImage() {
+            return image;
+        }
+
+        public void setImage(File encodedImage) {
+            this.image = image;
         }
 
         public String getProblemDescription() {
@@ -90,7 +116,7 @@ public class SmartCityController {
                 .getEncoder()
                 .encodeToString(fileContent);
         System.out.println("Image: " + encodedString);*/
-        System.out.println("Encoded Image: " + body.getEncodedImage());
+        System.out.println("Encoded Image: " + body.getImage());
         return "ReportPage";
     }
 

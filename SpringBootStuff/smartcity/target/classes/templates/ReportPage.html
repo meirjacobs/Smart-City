@@ -37,17 +37,17 @@
 <form th:action="@{/report}" th:object="${data}" method="post">
 <div>Problem Type:
     <select name="problemType">
-        <option value="Road Hazard">Road Hazard</option>
-        <option value="Criminal Act">Criminal Act</option>
-        <option value="Environmental Hazard">Environmental Hazard</option>
-        <option value="Vehicle Damage">Vehicle Damage</option>
-        <option value="Fire">Fire</option>
-        <option value="Water Damage">Water Damage</option>
-        <option value="Other">Other</option>
+        <option>Road Hazard</option>
+        <option>Criminal Act</option>
+        <option>Environmental Hazard</option>
+        <option>Vehicle Damage</option>
+        <option>Fire</option>
+        <option>Water Damage</option>
+        <option>Other</option>
     </select></div>
 <div>Location: <input name="latitude" placeholder="Latitude">, <input name="longitude" id="longitude" placeholder="Longitude"></div>
 <div>Problem Description: <input name="problemDescription"></div>
-<div>Image: <input name="encodedImage" type="file"></div>
+<div>Image: <input name="image" type="file"></div>
 <div id="button-container"><input id="submit" type="submit"></div>
 </form>
 </body>
