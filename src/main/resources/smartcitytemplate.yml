@@ -144,6 +144,7 @@ Resources:
         Bucket: !Ref ResourcesBucket
         Key: lambdas.zip
       Runtime: python3.8
+      Timeout: 15
       Handler: AddProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
@@ -224,10 +225,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-Emailer
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref SmartCityS3Bucket
       CodeUri:
         Bucket: !Ref ResourcesBucket
         Key: lambdas.zip
       Runtime: python3.8
+      Timeout: 15
       Handler: EmailerLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
   MySQLLayer:

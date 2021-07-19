@@ -78,7 +78,7 @@ def lambda_handler(event, context):
         counter += 1
 
     # prepare and insert problem into problems table
-    image_path = f'https://s3.console.aws.amazon.com/s3/buckets/{bucket}?region=us-east-1&prefix={id_number}/'
+    image_path = f'https://s3.console.aws.amazon.com/s3/buckets/{bucket}?prefix={id_number}/'
 
     insert = "INSERT INTO problems (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
     val = (event_body["problem_type"], event_body["problem_description"], event_body["location"][1], event_body["location"][0],
@@ -94,12 +94,17 @@ def lambda_handler(event, context):
     f"""The following issue has just been uploaded to our system and to all available employees who work in Department: {event_body['problem_type']}.
     Please take a look at the issue, its details, and decide if you can take it on.
     ID: {id_number}
-    Location: {location_url}
     Problem Type: {event_body['problem_type']}
-    Description: {event_body['problem_description']}"""
+    Description: {event_body['problem_description']}
+    Location: {location_url}""".replace("\n    ","\n")
     lambda_client = boto3.client('lambda')
     if len(employees_email_list) != 0:
-        email_event = {"email_list": employees_email_list,"subject": f"New {event_body['problem_type']} Issue Uploaded", "message": message}
+        email_event = {
+            "id_number": id_number,
+            "email_list": employees_email_list,
+            "subject": f"New {event_body['problem_type']} Issue Uploaded", 
+            "message": message
+        }
         lambda_client.invoke(
             FunctionName='CloudFormation-Emailer',
             InvocationType='Event',
