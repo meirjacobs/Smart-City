@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <title>Find Issue</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -34,32 +34,32 @@
 <body>
 <h1 id="header">Find Issue</h1>
 <div>Please fill out at least one field:</div>
-<div> Issue ID #: <input></div>
-<form>
+<form th:action="@{/find}" th:object="${data}" method="post">
+<div> Issue ID #: <input name="id"></div>
 <div>Problem Type:
-    <select>
-        <option value="Any">Any</option>
-        <option value="Road Hazard">Road Hazard</option>
-        <option value="Criminal Act">Criminal Act</option>
-        <option value="Environmental Hazard">Environmental Hazard</option>
-        <option value="Vehicle Damage">Vehicle Damage</option>
-        <option value="Fire">Fire</option>
-        <option value="Water Damage">Water Damage</option>
-        <option value="Other">Other</option>
+    <select name="problemType">
+        <option>Any</option>
+        <option>Road Hazard</option>
+        <option>Criminal Act</option>
+        <option>Environmental Hazard</option>
+        <option>Vehicle Damage</option>
+        <option>Fire</option>
+        <option>Water Damage</option>
+        <option>Other</option>
     </select></div>
-<div>Location: Within <input placeholder="Distance in km"> of <input placeholder="Latitude">, <input placeholder="Longitude"></div>
-<div>Problem Description: <input></div>
+<div>Location: Within <input placeholder="Distance in km" name="distance"> of <input placeholder="Latitude" name="latitude">, <input placeholder="Longitude" name="longitude"></div>
+<div>Problem Description: <input name="problemDescription"></div>
 <!--<div>Base-64 Encoded Image: <input></div>-->
-<div>Image: <input type="file"></div>
+<div>Image: <input type="file" name="image"></div>
 <div>Current Status:
-    <select>
+    <select name="status">
         <option value="Any">Any</option>
         <option value="Open">Open</option>
         <option value="In Progress">In Progress</option>
         <option value="Complete">Complete</option>
     </select>
 </div>
-<div>Time Reported: Between <input type="datetime-local"> and <input type="datetime-local"></div>
+<div>Time Reported: Between <input type="datetime-local" name="startTime"> and <input type="datetime-local" name="endTime"></div>
 <div id="button-container"><input id="submit" type="submit"></div>
 </form>
 </body>
