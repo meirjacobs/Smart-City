@@ -3,10 +3,13 @@ package com.smartcity.smartcity;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -65,30 +68,6 @@ public class SmartCityController {
             this.latitude = latitude;
         }
 
-        /*public List<MultipartFile> getImage() {
-            return image;
-        }
-
-        public void setImage(List<MultipartFile> encodedImage) {
-            this.image = image;
-        }*/
-
-        /*public MultipartFile getImage() {
-            return image;
-        }
-
-        public void setImage(MultipartFile image) {
-            this.image = image;
-        }*/
-
-        /*public String getImage() {
-            return image;
-        }
-
-        public void setImage(String encodedImage) {
-            this.image = image;
-        }*/
-
         public File getImage() {
             //System.out.println(image.getAbsolutePath());
             return image;
@@ -116,8 +95,6 @@ public class SmartCityController {
         private String problemDescription;
         private File image;
         private String status;
-        //private LocalDateTime startTime;
-        //private LocalDateTime endTime;
         private String startTime;
         private String endTime;
 
@@ -185,21 +162,6 @@ public class SmartCityController {
             this.status = status;
         }
 
-        /*public LocalDateTime getStartTime() {
-            return startTime;
-        }
-
-        public void setStartTime(LocalDateTime startTime) {
-            this.startTime = startTime;
-        }
-
-        public LocalDateTime getEndTime() {
-            return endTime;
-        }
-
-        public void setEndTime(LocalDateTime endTime) {
-            this.endTime = endTime;
-        }*/
         public String getStartTime() {
             return startTime;
         }
@@ -224,6 +186,29 @@ public class SmartCityController {
         System.out.println("Problem Description: " + body.getProblemDescription());
         System.out.println("Latitude: " + body.getLatitude());
         System.out.println("Longitude: " + body.getLongitude());
+
+        WebClient client = WebClient.create("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage");
+        WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.method(HttpMethod.POST);
+        WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");
+        String bodyString = "{\"problem_type\":\""+body.getProblemType()+"\",\"location\":["+body.getLatitude()+","+body.getLongitude()+"],\"problem_description\":\""+body.getProblemDescription()+"\",\"image_path\":[\""+body.getImage()+"\"]}";
+        //System.out.println(bodyString);
+        WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue(bodyString);
+        //Mono<String> response = headersSpec.retrieve().bodyToMono(String.class);
+        Mono<String> resp = headersSpec.exchangeToMono(response -> {
+            /*if (response.statusCode()
+                    .equals(HttpStatus.OK)) {
+                //System.out.println(">>>>" + response.bodyToMono(String.class));
+                return response.bodyToMono(String.class);
+            } else if (response.statusCode()
+                    .is4xxClientError()) {
+                return Mono.just("Error response");
+            } else {
+                return response.createException()
+                        .flatMap(Mono::error);
+            }*/
+            return response.bodyToMono(String.class);
+        });
+        resp.subscribe(System.out::println);
         //byte[] fileContent = Files.readAllBytes(body.getImage());
         /*byte[] fileContent = readFileToByteArray(body.getImage());
         String encodedString = Base64
@@ -239,7 +224,7 @@ public class SmartCityController {
             data = fileReader.read();
         }
         fileReader.close();*/
-        System.out.println("Encoded Image: " + body.getImage());
+        System.out.println("Image: " + body.getImage());
         //System.out.println("Encoded Image: " + body.getImage().getOriginalFilename());
         return "ReportPage";
     }
@@ -257,26 +242,34 @@ public class SmartCityController {
         System.out.println("Status: " + body.getStatus());
         System.out.println("Start Time: " + body.getStartTime());
         System.out.println("End Time: " + body.getEndTime());
-        return "FindPage";
-    }
 
-    @GetMapping("/report")
-    public String getReportPage(Model model) throws FileNotFoundException {
-        model.addAttribute("data", new PostData()); //assume SomeBean has a property called datePlanted
+        //WebClient.create("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage")
+        /*Mono<String> resp = WebClient.create().get()
+                .uri(builder -> builder/*.scheme("https")*/
+                        /*.host("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage").path("/")
+                        .queryParam("id", "1")
+                        .build())
+                .retrieve()
+                .bodyToMono(String.class);
+        resp.subscribe(System.out::println);*/
 
-        /*WebClient client = WebClient.create("https://x1vj5n9ki4.execute-api.us-east-1.amazonaws.com/deployedStage");
-        WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.method(HttpMethod.POST);
-        WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");
-        File file = new File("C:\\Users\\17324\\Downloads\\smartcity\\smartcity\\src\\main\\java\\com\\smartcity\\smartcity\\PostBody.txt");
+        /*WebClient client = WebClient.create("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage");
+        WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.method(HttpMethod.GET);
+        WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");*/
+        /*File file = new File("C:\\Users\\17324\\Downloads\\smartcity\\smartcity\\src\\main\\java\\com\\smartcity\\smartcity\\PostBody.txt");
         Scanner scanner = new Scanner(file);
         StringBuilder s = new StringBuilder();
         while (scanner.hasNextLine()) {
             s.append(scanner.nextLine());
         }
-        WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue(s.toString());
+        WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue(s.toString());*/
         //Mono<String> response = headersSpec.retrieve().bodyToMono(String.class);
+        //WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue("{\"id\":\"1\"}");
+        /*WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue("id=1");
         Mono<String> resp = headersSpec.exchangeToMono(response -> {
-            if (response.statusCode()
+            return response.bodyToMono(String.class);
+                }
+            /*if (response.statusCode()
                     .equals(HttpStatus.OK)) {
                 return response.bodyToMono(String.class);
             } else if (response.statusCode()
@@ -288,6 +281,38 @@ public class SmartCityController {
             }
         });
         resp.subscribe(System.out::println);*/
+        return "FindPage";
+    }
+
+    @GetMapping("/report")
+    public String getReportPage(Model model) throws FileNotFoundException {
+        model.addAttribute("data", new PostData());
+
+//        WebClient client = WebClient.create("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage");
+//        WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.method(HttpMethod.POST);
+//        WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");
+//        File file = new File("C:\\Users\\17324\\Downloads\\smartcity\\smartcity\\src\\main\\java\\com\\smartcity\\smartcity\\PostBody.txt");
+//        Scanner scanner = new Scanner(file);
+//        StringBuilder s = new StringBuilder();
+//        while (scanner.hasNextLine()) {
+//            s.append(scanner.nextLine());
+//        }
+//        WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue(s.toString());
+//        //Mono<String> response = headersSpec.retrieve().bodyToMono(String.class);
+//        Mono<String> resp = headersSpec.exchangeToMono(response -> {
+//            if (response.statusCode()
+//                    .equals(HttpStatus.OK)) {
+//                //System.out.println(">>>>" + response.bodyToMono(String.class));
+//                return response.bodyToMono(String.class);
+//            } else if (response.statusCode()
+//                    .is4xxClientError()) {
+//                return Mono.just("Error response");
+//            } else {
+//                return response.createException()
+//                        .flatMap(Mono::error);
+//            }
+//        });
+//        resp.subscribe(System.out::println);
         return "ReportPage";
     }
 
