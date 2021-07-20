@@ -35,7 +35,7 @@
 <h1 id="header">Find Issue</h1>
 <div>Please fill out at least one field:</div>
 <form th:action="@{/find}" th:object="${data}" method="post">
-<div> Issue ID #: <input name="id"></div>
+<div> Issue ID #: <input type="number" value="1" step="1" name="id"></div>
 <div>Problem Type:
     <select name="problemType">
         <option>Any</option>
@@ -47,10 +47,10 @@
         <option>Water Damage</option>
         <option>Other</option>
     </select></div>
-<div>Location: Within <input placeholder="Distance in km" name="distance"> of <input placeholder="Latitude" name="latitude">, <input placeholder="Longitude" name="longitude"></div>
+<div>Location: Within <input type="number" value="1.5" name="distance"> km of Latitude <input type="number" step="any" name="latitude" value="25.123">, Longitude <input type="number" step="any" name="longitude" id="longitude" value="50.456"></div>
 <div>Problem Description: <input name="problemDescription"></div>
 <!--<div>Base-64 Encoded Image: <input></div>-->
-<div>Image: <input type="file" name="image"></div>
+<div>Full Image Path: <input name="image" placeholder="C:\User\Pictures..."></div>
 <div>Current Status:
     <select name="status">
         <option value="Any">Any</option>

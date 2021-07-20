@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Scanner;
@@ -39,10 +40,10 @@ public class SmartCityController {
         private String latitude;
         private String longitude;
         private String problemDescription;
-        //private MultipartFile image;
-        //private String image;
-        private File image;
-        //private List<MultipartFile> image;
+        //private File image;
+        //private byte[] image;
+        //private byte[] image;
+        private String image;
 
         public String getProblemType() {
             return problemType;
@@ -68,12 +69,42 @@ public class SmartCityController {
             this.latitude = latitude;
         }
 
-        public File getImage() {
+        /*public File getImage() {
             //System.out.println(image.getAbsolutePath());
             return image;
         }
 
         public void setImage(File image) {
+            this.image = image;
+        }*/
+
+        /*public byte[] getImage() {
+            //System.out.println(image.getAbsolutePath());
+            return image;
+        }
+
+        public void setImage(byte[] image) {
+            System.out.println(Arrays.toString(image));
+            this.image = image;
+        }*/
+        /*public byte[] getImage() {
+            //System.out.println(image.getAbsolutePath());
+            return image;
+        }
+
+        public void setImage(MultipartFile image) throws IOException {
+            //System.out.println(Arrays.toString(image));
+            this.image = Base64.getEncoder().encode(image.getBytes());
+        }*/
+
+        public String getImage() throws IOException {
+            File imageFile = new File(image);
+            byte[] fileContent = Files.readAllBytes(imageFile.toPath());
+            return Base64.getEncoder().encodeToString(fileContent);
+            //return image;
+        }
+
+        public void setImage(String image)  {
             this.image = image;
         }
 
@@ -187,6 +218,12 @@ public class SmartCityController {
         System.out.println("Latitude: " + body.getLatitude());
         System.out.println("Longitude: " + body.getLongitude());
 
+        System.out.println("Image Path: [very long stuff that will fill up the whole console]" /*+ body.getImage()*/);
+        // System.out.println("Encoded image: " + Arrays.toString(body.getImage()));
+        //String encodedString =
+        //System.out.println(Base64.getEncoder().encode(body.getImage()));
+        //System.out.println("Encoded Image: " + );
+
         WebClient client = WebClient.create("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage");
         WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.method(HttpMethod.POST);
         WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");
@@ -195,7 +232,7 @@ public class SmartCityController {
         WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue(bodyString);
         //Mono<String> response = headersSpec.retrieve().bodyToMono(String.class);
         Mono<String> resp = headersSpec.exchangeToMono(response -> {
-            /*if (response.statusCode()
+            if (response.statusCode()
                     .equals(HttpStatus.OK)) {
                 //System.out.println(">>>>" + response.bodyToMono(String.class));
                 return response.bodyToMono(String.class);
@@ -205,8 +242,8 @@ public class SmartCityController {
             } else {
                 return response.createException()
                         .flatMap(Mono::error);
-            }*/
-            return response.bodyToMono(String.class);
+            }
+            //return response.bodyToMono(String.class);
         });
         resp.subscribe(System.out::println);
         //byte[] fileContent = Files.readAllBytes(body.getImage());
@@ -224,7 +261,7 @@ public class SmartCityController {
             data = fileReader.read();
         }
         fileReader.close();*/
-        System.out.println("Image: " + body.getImage());
+        //System.out.println("Image: " + body.getImage());
         //System.out.println("Encoded Image: " + body.getImage().getOriginalFilename());
         return "ReportPage";
     }

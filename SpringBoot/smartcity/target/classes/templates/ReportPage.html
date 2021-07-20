@@ -33,7 +33,7 @@
 </head>
 <body>
 <h1 id="header">Report Issue</h1>
-<div>Thank you for taking the time to report an issue. All fields besides for Image are required (and the image part doesn't work yet, so don't even try;):</div>
+<div>Thank you for taking the time to report an issue. All fields besides for Full Image Path are required:</div>
 <form th:action="@{/report}" th:object="${data}" method="post">
 <div>Problem Type:
     <select name="problemType">
@@ -45,10 +45,26 @@
         <option>Water Damage</option>
         <option>Other</option>
     </select></div>
-<div>Location: Latitude <input type="number" step="any" name="latitude" value="25.123">, Longitude <input type="number" step="any" name="longitude" id="longitude" value="50.456"></div>
+<div>Location: Latitude <input type="number" id="latitude" step="any" name="latitude" value="25.123">, Longitude <input type="number" id="longitude" step="any" name="longitude" value="50.456"><!--<button onClick="getLocation">Current Location</button>--></div>
 <div>Problem Description: <input name="problemDescription"></div>
-<div>Image: <input name="image" type="file"></div>
+<!--<div>Image: <input name="image" type="file"></div>-->
+<div>Full Image Path: <input name="image" placeholder="C:\User\Pictures..."></div>
 <div id="button-container"><input id="submit" type="submit"></div>
 </form>
+<!--<script>
+var latitude = document.getElementById("latitude");
+var longitude = document.getElementById("longitude");
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  }
+}
+
+function showPosition(position) {
+  latitude.value = position.coords.latitude;
+  longitude.value = positions.coords.longitude;
+}
+</script>-->
 </body>
 </html>
