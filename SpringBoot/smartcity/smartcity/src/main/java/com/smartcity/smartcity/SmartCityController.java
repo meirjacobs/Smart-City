@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import reactor.core.publisher.Mono;
 
 import java.io.*;
@@ -40,9 +41,6 @@ public class SmartCityController {
         private String latitude;
         private String longitude;
         private String problemDescription;
-        //private File image;
-        //private byte[] image;
-        //private byte[] image;
         private String image;
 
         public String getProblemType() {
@@ -68,34 +66,6 @@ public class SmartCityController {
         public void setLatitude(String latitude) {
             this.latitude = latitude;
         }
-
-        /*public File getImage() {
-            //System.out.println(image.getAbsolutePath());
-            return image;
-        }
-
-        public void setImage(File image) {
-            this.image = image;
-        }*/
-
-        /*public byte[] getImage() {
-            //System.out.println(image.getAbsolutePath());
-            return image;
-        }
-
-        public void setImage(byte[] image) {
-            System.out.println(Arrays.toString(image));
-            this.image = image;
-        }*/
-        /*public byte[] getImage() {
-            //System.out.println(image.getAbsolutePath());
-            return image;
-        }
-
-        public void setImage(MultipartFile image) throws IOException {
-            //System.out.println(Arrays.toString(image));
-            this.image = Base64.getEncoder().encode(image.getBytes());
-        }*/
 
         public String getImage() throws IOException {
             File imageFile = new File(image);
@@ -211,6 +181,37 @@ public class SmartCityController {
     }
 
     @PostMapping("/report")
+    public String handleFileUpload(@RequestParam("file") MultipartFile file, @RequestParam("problemType") String problemType,
+                                   @RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
+                                   @RequestParam("problemDescription") String problemDescription,
+                                   RedirectAttributes redirectAttributes) throws IOException {
+        redirectAttributes.addFlashAttribute("message",
+                "You successfully uploaded " + file.getOriginalFilename() + "\nproblem type = " + problemType +
+                        "\nlatitude = " + latitude + "\nlongitude = " + longitude + "\nproblem description = " + problemDescription);
+        System.out.println("You successfully uploaded " + file.getOriginalFilename() + "\nproblem type = " + problemType +
+                "\nlatitude = " + latitude + "\nlongitude = " + longitude + "\nproblem description = " + problemDescription);
+        WebClient client = WebClient.create("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage");
+        WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.method(HttpMethod.POST);
+        WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");
+        String bodyString = "{\"problem_type\":\""+problemType+"\",\"location\":["+latitude+","+longitude+"],\"problem_description\":\""+problemDescription+"\",\"image_path\":[\""+Base64.getEncoder().encodeToString(file.getBytes())+"\"]}";
+        WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue(bodyString);
+        Mono<String> resp = headersSpec.exchangeToMono(response -> {
+            if (response.statusCode()
+                    .equals(HttpStatus.OK)) {
+                return response.bodyToMono(String.class);
+            } else if (response.statusCode()
+                    .is4xxClientError()) {
+                return Mono.just("Error response");
+            } else {
+                return response.createException()
+                        .flatMap(Mono::error);
+            }
+        });
+        resp.subscribe(System.out::println);
+        return "redirect:/report";
+    }
+
+    /*@PostMapping("/report")
     public String submitReport(@ModelAttribute("data") PostData body) throws IOException {
         System.out.println("--REPORT--");
         System.out.println("Problem Type: " + body.getProblemType());
@@ -218,17 +219,12 @@ public class SmartCityController {
         System.out.println("Latitude: " + body.getLatitude());
         System.out.println("Longitude: " + body.getLongitude());
 
-        System.out.println("Image Path: [very long stuff that will fill up the whole console]" /*+ body.getImage()*/);
-        // System.out.println("Encoded image: " + Arrays.toString(body.getImage()));
-        //String encodedString =
-        //System.out.println(Base64.getEncoder().encode(body.getImage()));
-        //System.out.println("Encoded Image: " + );
-
+        System.out.println("Image Path: [very long stuff that will fill up the whole console]" + body.getImage());
+/*
         WebClient client = WebClient.create("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage");
         WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.method(HttpMethod.POST);
         WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");
         String bodyString = "{\"problem_type\":\""+body.getProblemType()+"\",\"location\":["+body.getLatitude()+","+body.getLongitude()+"],\"problem_description\":\""+body.getProblemDescription()+"\",\"image_path\":[\""+body.getImage()+"\"]}";
-        //System.out.println(bodyString);
         WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue(bodyString);
         //Mono<String> response = headersSpec.retrieve().bodyToMono(String.class);
         Mono<String> resp = headersSpec.exchangeToMono(response -> {
@@ -246,25 +242,8 @@ public class SmartCityController {
             //return response.bodyToMono(String.class);
         });
         resp.subscribe(System.out::println);
-        //byte[] fileContent = Files.readAllBytes(body.getImage());
-        /*byte[] fileContent = readFileToByteArray(body.getImage());
-        String encodedString = Base64
-                .getEncoder()
-                .encodeToString(fileContent);
-        System.out.println("Image: " + encodedString);*/
-        /*Reader fileReader = new FileReader(body.getImage());
-        int data = fileReader.read();
-        while(data != -1) {
-            //do something with data...
-            System.out.println("Data :" + data);
-
-            data = fileReader.read();
-        }
-        fileReader.close();*/
-        //System.out.println("Image: " + body.getImage());
-        //System.out.println("Encoded Image: " + body.getImage().getOriginalFilename());
         return "ReportPage";
-    }
+    }*/
 
     @PostMapping("/find")
     public String submitFind(@ModelAttribute("data") GetData body) {
@@ -279,77 +258,12 @@ public class SmartCityController {
         System.out.println("Status: " + body.getStatus());
         System.out.println("Start Time: " + body.getStartTime());
         System.out.println("End Time: " + body.getEndTime());
-
-        //WebClient.create("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage")
-        /*Mono<String> resp = WebClient.create().get()
-                .uri(builder -> builder/*.scheme("https")*/
-                        /*.host("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage").path("/")
-                        .queryParam("id", "1")
-                        .build())
-                .retrieve()
-                .bodyToMono(String.class);
-        resp.subscribe(System.out::println);*/
-
-        /*WebClient client = WebClient.create("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage");
-        WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.method(HttpMethod.GET);
-        WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");*/
-        /*File file = new File("C:\\Users\\17324\\Downloads\\smartcity\\smartcity\\src\\main\\java\\com\\smartcity\\smartcity\\PostBody.txt");
-        Scanner scanner = new Scanner(file);
-        StringBuilder s = new StringBuilder();
-        while (scanner.hasNextLine()) {
-            s.append(scanner.nextLine());
-        }
-        WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue(s.toString());*/
-        //Mono<String> response = headersSpec.retrieve().bodyToMono(String.class);
-        //WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue("{\"id\":\"1\"}");
-        /*WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue("id=1");
-        Mono<String> resp = headersSpec.exchangeToMono(response -> {
-            return response.bodyToMono(String.class);
-                }
-            /*if (response.statusCode()
-                    .equals(HttpStatus.OK)) {
-                return response.bodyToMono(String.class);
-            } else if (response.statusCode()
-                    .is4xxClientError()) {
-                return Mono.just("Error response");
-            } else {
-                return response.createException()
-                        .flatMap(Mono::error);
-            }
-        });
-        resp.subscribe(System.out::println);*/
         return "FindPage";
     }
 
     @GetMapping("/report")
     public String getReportPage(Model model) throws FileNotFoundException {
         model.addAttribute("data", new PostData());
-
-//        WebClient client = WebClient.create("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage");
-//        WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.method(HttpMethod.POST);
-//        WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");
-//        File file = new File("C:\\Users\\17324\\Downloads\\smartcity\\smartcity\\src\\main\\java\\com\\smartcity\\smartcity\\PostBody.txt");
-//        Scanner scanner = new Scanner(file);
-//        StringBuilder s = new StringBuilder();
-//        while (scanner.hasNextLine()) {
-//            s.append(scanner.nextLine());
-//        }
-//        WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue(s.toString());
-//        //Mono<String> response = headersSpec.retrieve().bodyToMono(String.class);
-//        Mono<String> resp = headersSpec.exchangeToMono(response -> {
-//            if (response.statusCode()
-//                    .equals(HttpStatus.OK)) {
-//                //System.out.println(">>>>" + response.bodyToMono(String.class));
-//                return response.bodyToMono(String.class);
-//            } else if (response.statusCode()
-//                    .is4xxClientError()) {
-//                return Mono.just("Error response");
-//            } else {
-//                return response.createException()
-//                        .flatMap(Mono::error);
-//            }
-//        });
-//        resp.subscribe(System.out::println);
         return "ReportPage";
     }
 

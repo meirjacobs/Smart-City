@@ -1,3 +1,74 @@
+<!--<!DOCTYPE HTML>-->
+<!--<html xmlns:th="http://www.w3.org/1999/xhtml">-->
+<!--<head>-->
+<!--    <title>Report Issue</title>-->
+<!--    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />-->
+<!--    <style>-->
+<!--        body {-->
+<!--            background-color: rgb(210, 255, 200);-->
+<!--        }-->
+<!--        #header {-->
+<!--            font-family: sans-serif;-->
+<!--            color: blue;-->
+<!--            text-align: center;-->
+<!--        }-->
+<!--        div, input, select {-->
+<!--            font-family: monospace;-->
+<!--            margin-top: 5px;-->
+<!--        }-->
+<!--        #submit {-->
+<!--            padding: 20px;-->
+<!--            margin: 10px;-->
+<!--            background-color: rgb(255, 255, 210);-->
+<!--            border-radius: 10px;-->
+<!--        }-->
+<!--        #submit:hover {-->
+<!--            cursor: pointer;-->
+<!--            background-color: rgb(230, 230, 190);-->
+<!--        }-->
+<!--        #button-container {-->
+<!--            text-align: center;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1 id="header">Report Issue</h1>-->
+<!--<div>Thank you for taking the time to report an issue. All fields besides for Full Image Path are required:</div>-->
+<!--<form th:action="@{/report}" th:object="${data}" method="post">-->
+<!--<div>Problem Type:-->
+<!--    <select name="problemType">-->
+<!--        <option>Road Hazard</option>-->
+<!--        <option>Criminal Act</option>-->
+<!--        <option>Environmental Hazard</option>-->
+<!--        <option>Vehicle Damage</option>-->
+<!--        <option>Fire</option>-->
+<!--        <option>Water Damage</option>-->
+<!--        <option>Other</option>-->
+<!--    </select></div>-->
+<!--<div>Location: Latitude <input type="number" id="latitude" step="any" name="latitude" value="25.123">, Longitude <input type="number" id="longitude" step="any" name="longitude" value="50.456">&lt;!&ndash;<button onClick="getLocation">Current Location</button>&ndash;&gt;</div>-->
+<!--<div>Problem Description: <input name="problemDescription"></div>-->
+<!--<div>Image: <input name="image" type="file"></div>-->
+<!--&lt;!&ndash;<div>Full Image Path: <input name="image" placeholder="C:\User\Pictures..."></div>&ndash;&gt;-->
+<!--<div id="button-container"><input id="submit" type="submit"></div>-->
+<!--</form>-->
+<!--&lt;!&ndash;<script>-->
+<!--var latitude = document.getElementById("latitude");-->
+<!--var longitude = document.getElementById("longitude");-->
+
+<!--function getLocation() {-->
+<!--  if (navigator.geolocation) {-->
+<!--    navigator.geolocation.getCurrentPosition(showPosition);-->
+<!--  }-->
+<!--}-->
+
+<!--function showPosition(position) {-->
+<!--  latitude.value = position.coords.latitude;-->
+<!--  longitude.value = positions.coords.longitude;-->
+<!--}-->
+<!--</script>&ndash;&gt;-->
+<!--</body>-->
+<!--</html>-->
+
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
@@ -34,37 +105,30 @@
 <body>
 <h1 id="header">Report Issue</h1>
 <div>Thank you for taking the time to report an issue. All fields besides for Full Image Path are required:</div>
-<form th:action="@{/report}" th:object="${data}" method="post">
-<div>Problem Type:
-    <select name="problemType">
-        <option>Road Hazard</option>
-        <option>Criminal Act</option>
-        <option>Environmental Hazard</option>
-        <option>Vehicle Damage</option>
-        <option>Fire</option>
-        <option>Water Damage</option>
-        <option>Other</option>
-    </select></div>
-<div>Location: Latitude <input type="number" id="latitude" step="any" name="latitude" value="25.123">, Longitude <input type="number" id="longitude" step="any" name="longitude" value="50.456"><!--<button onClick="getLocation">Current Location</button>--></div>
-<div>Problem Description: <input name="problemDescription"></div>
-<!--<div>Image: <input name="image" type="file"></div>-->
-<div>Full Image Path: <input name="image" placeholder="C:\User\Pictures..."></div>
-<div id="button-container"><input id="submit" type="submit"></div>
+<div th:if="${message}">
+    <h2 th:text="${message}"/>
+</div>
+<!--<form method="post" enctype="multipart/form-data" action="/">-->
+<form th:action="@{/report}" enctype="multipart/form-data" method="post">
+    <div>Problem Type:
+        <select name="problemType">
+            <option>Road Hazard</option>
+            <option>Criminal Act</option>
+            <option>Environmental Hazard</option>
+            <option>Vehicle Damage</option>
+            <option>Fire</option>
+            <option>Water Damage</option>
+            <option>Other</option>
+        </select>
+    </div>
+    <div>Location: Latitude <input type="number" id="latitude" step="any" name="latitude" value="25.123">, Longitude <input type="number" id="longitude" step="any" name="longitude" value="50.456"><!--<button onClick="getLocation">Current Location</button>--></div>
+    <div>Problem Description: <input name="problemDescription"></div>
+    <div>
+        <table>
+            <tr><td>File to upload:</td><td><input type="file" name="file" /></td></tr>
+            <tr><td></td><td><input type="submit" value="Upload" /></td></tr>
+        </table>
+    </div>
 </form>
-<!--<script>
-var latitude = document.getElementById("latitude");
-var longitude = document.getElementById("longitude");
-
-function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  }
-}
-
-function showPosition(position) {
-  latitude.value = position.coords.latitude;
-  longitude.value = positions.coords.longitude;
-}
-</script>-->
 </body>
 </html>
