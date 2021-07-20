@@ -1,0 +1,294 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: "Deploys Smart-City containing: API Gateway with Lambda integrations, MySQL database with tables, and credentials from SecretsManager. For more information see our project at https://github.com/meirjacobs/Smart-City"
+Parameters:
+  ResourcesBucket:
+    Type: String
+    Description: "Please enter the name of the S3 Bucket containing the resources."
+  EmailAddress:
+    Type: String
+    Description: "Please enter the username of the email address you wish to send emails from. Note: this must be a Gmail account"
+  EmailPassword:
+    Type: String
+    Description: "Please enter the password of the email address you wish to send emails from."
+    NoEcho: true
+Resources:
+  SmartCityS3Bucket:
+    Type: AWS::S3::Bucket
+  SmartCityS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SmartCityS3Bucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - 's3:*'
+            Effect: Allow
+            Resource: !Join [ '', [ 'arn:aws:s3:::', !Ref SmartCityS3Bucket, '/*' ] ]
+            Principal: '*'
+  SmartCityAPIGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description: Smart City API Gateway
+      Name: SmartCityAPIGateway
+      EndpointConfiguration:
+        Types:
+          - EDGE
+  ApiGatewayPost:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - StatusCode: 200
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !GetAtt AddProblem.Arn
+      ResourceId: !GetAtt SmartCityAPIGateway.RootResourceId
+      RestApiId: !Ref SmartCityAPIGateway
+  ApiGatewayGet:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: GET
+      RequestParameters:
+        method.request.querystring.id: 'true'
+        method.request.querystring.problem_type: 'false'
+        method.request.querystring.problem_description: 'false'
+        method.request.querystring.time_found: 'false'
+        method.request.querystring.current_status: 'false'
+        method.request.querystring.location: 'false'
+        method.request.querystring.distance: 'false'
+        method.request.querystring.image_path: 'false'
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        RequestParameters:
+          integration.request.querystring.id: method.request.querystring.id
+          integration.request.querystring.problem_type: method.request.querystring.problem_type
+          integration.request.querystring.problem_description: method.request.querystring.problem_description
+          integration.request.querystring.time_found: method.request.querystring.time_found
+          integration.request.querystring.current_status: method.request.querystring.current_status
+          integration.request.querystring.location: method.request.querystring.location
+          integration.request.querystring.distance: method.request.querystring.distance
+          integration.request.querystring.image_path: method.request.querystring.image_path
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !GetAtt ReadProblem.Arn
+      ResourceId: !GetAtt SmartCityAPIGateway.RootResourceId
+      RestApiId: !Ref SmartCityAPIGateway
+  ApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - ApiGatewayPost
+      - ApiGatewayGet
+    Properties:
+      RestApiId: !Ref SmartCityAPIGateway
+      StageName: deployedStage
+  APILambdaPostPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !Ref AddProblem
+      Principal: "apigateway.amazonaws.com"
+  APILambdaGetPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !Ref ReadProblem
+      Principal: "apigateway.amazonaws.com"
+  SmartCityLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: smart-city-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: '/'
+      Policies:
+      - PolicyName: logs
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - secretsmanager:*
+            - s3:*
+            - lambda:InvokeFunction
+            - lambda:InvokeAsync
+            Resource:
+            - arn:aws:lambda:*:*:function:*
+            - !GetAtt SmartCityS3Bucket.Arn
+            - arn:*:logs:*:*:*
+            - !Ref MySQLSecret
+            - !Ref EmailSecret
+  AddProblem:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-AddProblem
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref SmartCityS3Bucket
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
+      Runtime: python3.8
+      Timeout: 15
+      Handler: AddProblemLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref MySQLLayer
+  ReadProblem:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-ReadProblem
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
+      Runtime: python3.8
+      Handler: ReadProblemLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref MySQLLayer
+  AddEmployee:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-AddEmployee
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
+      Runtime: python3.8
+      Handler: AddEmployeeLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref MySQLLayer
+  DeleteEmployee:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-DeleteEmployee
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
+      Runtime: python3.8
+      Handler: DeleteEmployeeLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref MySQLLayer
+  UpdateProblem:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-UpdateProblem
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
+      Runtime: python3.8
+      Handler: UpdateProblemLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref MySQLLayer
+  LogProblem:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-LogProblem
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
+      Runtime: python3.8
+      Handler: LogProblemLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref MySQLLayer
+  DeleteProblem:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-DeleteProblem
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
+      Runtime: python3.8
+      Handler: DeleteProblemLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref MySQLLayer
+  Emailer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-Emailer
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref SmartCityS3Bucket
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
+      Runtime: python3.8
+      Timeout: 15
+      Handler: EmailerLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+  MySQLLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: CloudFormation-MySQL_Layer
+      ContentUri: 
+        Bucket: !Ref ResourcesBucket
+        Key: mysql_layer.zip
+  MySQLSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: MySQL-Credentials
+      Description: "This secret creates the credentials for MySQL with a dynamically generated secret password."
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "admin", "dbname": "Smart_City"}'
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: '\/@"'
+  EmailSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: Email-Credentials
+      Description: "This secret contains the credentials of the email address that sends the emails."
+      SecretString: !Join [ '', [ '{"username": "', !Ref EmailAddress, '", ', '"password": "', !Ref EmailPassword, '"}' ] ]
+  SmartCityDB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 5
+      DBInstanceClass: db.t2.micro
+      Engine: mysql
+      MasterUsername: !Join [ '', [ '{{resolve:secretsmanager:', !Ref MySQLSecret, ':SecretString:username}}' ] ]
+      MasterUserPassword: !Join [ '', [ '{{resolve:secretsmanager:', !Ref MySQLSecret, ':SecretString:password}}' ] ]
+  MySQLSecretHost:
+    Type: "AWS::SecretsManager::SecretTargetAttachment"
+    Properties:
+      SecretId: !Ref MySQLSecret
+      TargetId: !Ref SmartCityDB
+      TargetType: AWS::RDS::DBInstance
+  CreateTables:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: CloudFormation-CreateTables
+      CodeUri:
+        Bucket: !Ref ResourcesBucket
+        Key: lambdas.zip
+      Runtime: python3.8
+      Handler: CreateTablesLambda.lambda_handler
+      Role: !GetAtt SmartCityLambdaRole.Arn
+      Layers:
+        - !Ref MySQLLayer
+  TableCreator:
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+      ServiceToken: !GetAtt CreateTables.Arn
+    DependsOn:
+      - SmartCityDB
+      - MySQLSecret
+      - MySQLSecretHost
