@@ -1,6 +1,7 @@
 package com.smartcity.smartcity;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -151,7 +152,7 @@ public class SmartCityController {
             }
         });
         resp.subscribe(System.out::println);
-        return "ReportPage";
+        return "ThankYouPage";
     }
 
     @PostMapping("/find")
@@ -209,7 +210,7 @@ public class SmartCityController {
     }
 
     @GetMapping("/results")
-    public String getResultsPage() {
+    public String getResultsPage(/*@ModelAttribute("message") String message*/) {
         return "SearchResults";
     }
 
@@ -222,5 +223,10 @@ public class SmartCityController {
     public String getFindPage(Model model) {
         model.addAttribute("data", new GetData());
         return "FindPage";
+    }
+
+    @GetMapping("/thanks")
+    public String getThanksPage() {
+        return "ThankYouPage";
     }
 }
