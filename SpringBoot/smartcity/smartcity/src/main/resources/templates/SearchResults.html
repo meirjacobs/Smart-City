@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Find Issue</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        body {
+            background-color: rgb(210, 255, 200);
+        }
+        #header {
+            font-family: sans-serif;
+            color: blue;
+            text-align: center;
+        }
+        div {
+            font-family: monospace;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1 id="header">Search Results</h1>
+<div th:if="${message}">
+    <h2 th:text="${message}"/>
+</div>
+</body>
+</html>

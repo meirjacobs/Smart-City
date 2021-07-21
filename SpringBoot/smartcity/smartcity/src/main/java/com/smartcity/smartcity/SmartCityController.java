@@ -1,5 +1,7 @@
 package com.smartcity.smartcity;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
@@ -8,6 +10,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import reactor.core.publisher.Mono;
 import java.io.*;
 import java.util.*;
@@ -15,6 +18,9 @@ import java.util.*;
 
 @org.springframework.stereotype.Controller
 public class SmartCityController {
+
+    @Autowired
+    private Environment env;
 
     @GetMapping("/")
     public String getHomePage() {
@@ -118,16 +124,16 @@ public class SmartCityController {
     public String handleFileUpload(@RequestParam("image") MultipartFile[] files, @RequestParam("problemType") String problemType,
                                    @RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
                                    @RequestParam("problemDescription") String problemDescription) throws IOException {
-        WebClient client = WebClient.create("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage");
+        WebClient client = WebClient.create(env.getProperty("apiURL"));
         WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.method(HttpMethod.POST);
         WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");
-        String fileString = "";
+        StringBuilder fileString = new StringBuilder();
         for (int i = 0; i < files.length; i++) {
-            fileString = fileString + "\"";
-            fileString = fileString + Base64.getEncoder().encodeToString(files[i].getBytes());
-            fileString = fileString + "\"";
+            fileString.append("\"");
+            fileString.append(Base64.getEncoder().encodeToString(files[i].getBytes()));
+            fileString.append("\"");
             if (files.length != 1 && i != files.length - 1) {
-                fileString = fileString + ",";
+                fileString.append(",");
             }
         }
         String bodyString = "{\"problem_type\":\""+problemType+"\",\"location\":["+latitude+","+longitude+"],\"problem_description\":\""+problemDescription+"\",\"image_path\":["+fileString+"]}";
@@ -149,8 +155,8 @@ public class SmartCityController {
     }
 
     @PostMapping("/find")
-    public String submitFind(@ModelAttribute("data") GetData body) {
-        System.out.println("--FIND--");
+    public String submitFind(@ModelAttribute("data") GetData body, RedirectAttributes redirectAttributes) {
+        /*System.out.println("--FIND--");
         System.out.println("ID: " + body.getId());
         System.out.println("Problem Type: " + body.getProblemType());
         System.out.println("Problem Description: " + body.getProblemDescription());
@@ -160,7 +166,7 @@ public class SmartCityController {
         System.out.println("Image: " + body.getImage());
         System.out.println("Status: " + body.getStatus());
         System.out.println("Start Time: " + body.getStartTime());
-        System.out.println("End Time: " + body.getEndTime());
+        System.out.println("End Time: " + body.getEndTime());*/
 
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         if (!body.getId().equals("0")) {
@@ -182,7 +188,7 @@ public class SmartCityController {
 
         WebClient client = WebClient
                 .builder()
-                .baseUrl("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage")
+                .baseUrl(env.getProperty("apiURL"))
                 .build();
         List<String> types = Arrays.asList("id", "problem_type", "problem_description", "time_found", "current_status",
                 "location", "image_path", "distance");
@@ -196,9 +202,15 @@ public class SmartCityController {
                 .bodyToFlux(String.class)
                 .collectList()
                 .block();
-        System.out.println(results);
+        redirectAttributes.addFlashAttribute("message", results);
+        //System.out.println(results);
 
-        return "FindPage";
+        return "redirect:/results";
+    }
+
+    @GetMapping("/results")
+    public String getResultsPage() {
+        return "SearchResults";
     }
 
     @GetMapping("/report")

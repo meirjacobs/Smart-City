@@ -32,6 +32,9 @@
     </style>
 </head>
 <body>
+<div th:if="${message}">
+    <h2 th:text="${message}"/>
+</div>
 <h1 id="header">Find Issue</h1>
 <div>Please fill out at least one field:</div>
 <form th:action="@{/find}" th:object="${data}" method="post">
