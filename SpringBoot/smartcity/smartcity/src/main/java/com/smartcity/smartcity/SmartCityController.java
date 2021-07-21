@@ -165,10 +165,10 @@ public class SmartCityController {
         if (!body.getProblemDescription().equals("")) {
             queryParams.put("problem_description", Arrays.asList(body.getProblemDescription()));
         }
-        /*if (!body.getDistance().equals("") && !body.getLatitude().equals("") && !body.getLongitude().equals("")) {
+        if (!body.getDistance().equals("") && !body.getLatitude().equals("") && !body.getLongitude().equals("")) {
             queryParams.put("distance", Arrays.asList(body.getDistance()));
-            queryParams.put("location", Arrays.asList("[" + body.getLatitude() + "," + body.getLongitude() + "]"));
-        }*/
+            queryParams.put("location", Arrays.asList(body.getLatitude() + "," + body.getLongitude()));
+        }
         if (!body.getStatus().equals("Any")) {
             queryParams.put("current_status", Arrays.asList(body.getStatus()));
         }
@@ -178,13 +178,12 @@ public class SmartCityController {
                 .baseUrl("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage")
                 .build();
         List<String> types = Arrays.asList("id", "problem_type", "problem_description", "time_found", "current_status",
-                "location", "image_path");
+                "location", "image_path", "distance");
         List<String> results = client
                 .get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/")
                         .queryParams(queryParams)
-                        //add all query string parameters
                         .build())
                 .retrieve()
                 .bodyToFlux(String.class)
