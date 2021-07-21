@@ -8,16 +8,53 @@ import botocore.config
 
 import mysql.connector
 
+event_body = None
+mydb = None
+mycursor = None
+lambda_client = None
+
 def lambda_handler(event, context):
-    
+
+    global event_body
     event_body = json.loads(event["body"])
 
     # check input to ensure it is valid
+    invalid = validate_input()
+    if invalid:
+        return invalid
 
+    # connect to MySQL
+    mysql_connect()
+
+    # get id number
+    event_body["id_number"] = get_id_number()
+    
+    # upload images to new folder in S3 Bucket
+    event_body["image_path"] = upload_images()
+
+    # prepare and insert problem into problems table
+    insert_problem()
+    mydb.commit()
+    
+    global lambda_client
+    lambda_client = boto3.client('lambda')
+
+    # email employees in the specific department of this issue
+    email_employees()
+
+    # prepare and insert data into logs_history table
+    log_problem()
+
+    return {
+        'statusCode': 200,
+        'body': "Success, problem ticket uploaded. An employee will soon take care of the issue."
+    }
+
+def validate_input():
     if len(event_body) != 4:
         return {
             'statusCode': 400,
-            'body': f'Four items requires. Received {len(event_body)}. \n Input: {json.dumps(event_body)}'
+            'body': f'Four items requires. Received {len(event_body)}.\nInput: {json.dumps(event_body)}'
         }
 
     problem_type_list = ['Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', 'Other']
@@ -45,62 +82,64 @@ def lambda_handler(event, context):
             'body': "'image_path' is a required field which must be a list of strings"
         }
 
-    # connect to MySQL
+def mysql_connect():
     sm_client = boto3.client("secretsmanager")
     secret = sm_client.get_secret_value(SecretId='MySQL-Credentials')
     credentials = json.loads(secret['SecretString'])
+    global mydb
     mydb = mysql.connector.connect(
         host=credentials['host'],
         user=credentials['username'],
         password=credentials['password'],
         database=credentials['dbname']
     )
+    global mycursor
     mycursor = mydb.cursor()
 
-    # get id number
+def get_id_number():
     mycursor.execute(f"SHOW CREATE TABLE problems")
     id_number = mycursor.fetchall()[0][1]
-    if len(id_number) == 521:
-        id_number = 1
+    if len(id_number) == 512:
+        return 1
     else:
-        id_number = int(id_number[486:-51])
+        return int(id_number[477:-51])
 
-    # upload images to new folder in S3 Bucket
+def upload_images():
+    if event_body["image_path"][0] == "":
+        return None
+
     bucket = os.environ["BUCKET_NAME"]
     
     counter = 0
     s3_client = boto3.client('s3')
     for img in event_body["image_path"]:
         file_name = f'img{counter}.jpg'
-        file_path = f'{id_number}/{file_name}'
+        file_path = f'{event_body["id_number"]}/{file_name}'
         img = base64.b64decode(event_body["image_path"][counter])
         s3_client.put_object(Bucket=bucket, Key=file_path, Body=img)
         counter += 1
+    return f'https://s3.console.aws.amazon.com/s3/buckets/{bucket}?prefix={event_body["id_number"]}/'
 
-    # prepare and insert problem into problems table
-    image_path = f'https://s3.console.aws.amazon.com/s3/buckets/{bucket}?prefix={id_number}/'
-
+def insert_problem():
     insert = "INSERT INTO problems (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
-    val = (event_body["problem_type"], event_body["problem_description"], event_body["location"][1], event_body["location"][0],
-           image_path)
+    val = (event_body["problem_type"], event_body["problem_description"], event_body["location"][1], event_body["location"][0], event_body["image_path"])
     mycursor.execute(insert, val)
-    mydb.commit()
 
-    # email employees in the specific department of this issue
+def email_employees():
     mycursor.execute(f"SELECT email FROM employees WHERE current_assignment_id IS null AND department = '{event_body['problem_type']}'")
     employees_email_list = [employee_email[0] for employee_email in mycursor.fetchall()]
-    location_url = f'https://www.google.com/maps/search/?api=1&query={event_body["location"][0]}%2C{event_body["location"][1]}'    
+    location_url = f'https://www.google.com/maps/search/?api=1&query={event_body["location"][0]}%2C{event_body["location"][1]}'
     message = \
     f"""The following issue has just been uploaded to our system and to all available employees who work in Department: {event_body['problem_type']}.
     Please take a look at the issue, its details, and decide if you can take it on.
-    ID: {id_number}
+    ID: {event_body["id_number"]}
     Problem Type: {event_body['problem_type']}
     Description: {event_body['problem_description']}
     Location: {location_url}""".replace("\n    ","\n")
-    lambda_client = boto3.client('lambda')
+   
     if len(employees_email_list) != 0:
         email_event = {
-            "id_number": id_number,
+            "id_number": event_body["id_number"],
             "email_list": employees_email_list,
             "subject": f"New {event_body['problem_type']} Issue Uploaded", 
             "message": message
@@ -110,23 +149,16 @@ def lambda_handler(event, context):
             InvocationType='Event',
             Payload=json.dumps(email_event)
         )
-
-    # prepare and insert data into logs_history table
-    event_body['id_number'] = id_number
-    mycursor.execute(f"SELECT time_found FROM problems WHERE id = {id_number}")
+    
+def log_problem():
+    mycursor.execute(f"SELECT time_found FROM problems WHERE id = {event_body['id_number']}")
     event_body['time_found'] = str(mycursor.fetchall()[0][0])
     event_body['current_status'] = "Open"
     event_body['previous_status'] = None
     event_body['assigned_employee_id'] = None
-    event_body['image_path'] = image_path
 
     lambda_client.invoke(
         FunctionName='CloudFormation-LogProblem',
         InvocationType='Event',
         Payload=json.dumps(event_body)
     )
-
-    return {
-        'statusCode': 200,
-        'body': "Success, problem ticket uploaded. An employee will soon take care of the issue."
-    }

@@ -1,0 +1,441 @@
+AddEmployee:
+- not enough fields
+{
+  "first_name": "John",
+  "last_name": "Johnson",
+  "email": "test@gmail.com"
+}
+- non-existant email
+{
+  "first_name": "John",
+  "last_name": "Johnson",
+  "email": "snssmartcity@gmail.com",
+  "department": "Water Damage"
+}
+- email already in table
+{
+  "first_name": "John",
+  "last_name": "Johnson",
+  "email": "emusk20021@gmail.com",
+  "department": "Water Damage"
+}
+- type errors (several)
+{
+  "first_name": 7,
+  "last_name": "Johnson",
+  "email": "emusk20021@gmail.com",
+  "department": "Water Damage"
+}
+{
+  "first_name": "John",
+  "last_name": ["hey"],
+  "email": "emusk20021@gmail.com",
+  "department": "Water Damage"
+}
+{
+  "first_name": "John",
+  "last_name": "Johnson",
+  "email": {"one": 1},
+  "department": "Water Damage"
+}
+{
+  "first_name": "John",
+  "last_name": "Johnson",
+  "email": "emusk20021@gmail.com",
+  "department": "Water Bad"
+}
+- SUCCESS
+{
+  "first_name": "John",
+  "last_name": "Johnson",
+  "email": "18nsolooki@maimonides.org",
+  "department": "Other"
+}
+
+AddProblem (+Emailer&LogProblem):
+- not enough fields
+{
+  "body": {
+    "location": [
+      36.20914513392121,
+      -115.19957114599852
+    ],
+    "problem_type": "Criminal Act",
+    "problem_description": "bank heist"
+  }
+}
+- type errors (several)
+{
+  "body": {
+    "location": "my house",
+    "problem_type": "Criminal Act",
+    "problem_description": "bank heist",
+    "image_path": []
+  }
+}
+{
+  "body": {
+    "location": [
+      36.20914513392121,
+      -115.19957114599852
+    ],
+    "problem_type": "the third one",
+    "problem_description": "bank heist",
+    "image_path": []
+  }
+}
+{
+  "body": {
+    "location": [
+      36.20914513392121,
+      -115.19957114599852
+    ],
+    "problem_type": "Criminal Act",
+    "problem_description": 7,
+    "image_path": []
+  }
+}
+{
+  "body": {
+    "location": [
+      36.20914513392121,
+      -115.19957114599852
+    ],
+    "problem_type": "the third one",
+    "problem_description": "bank heist",
+    "image_path": {"pic": "img"}
+  }
+}
+{
+  "body": {
+    "location": [
+      136.20914513392121,
+      -115.19957114599852
+    ],
+    "problem_type": "Criminal Act",
+    "problem_description": "bank heist",
+    "image_path": []
+  }
+}
+- SUCCESS
+-- no image
+{
+  "body": {
+    "location": [
+      36.20914513392121,
+      -115.19957114599852
+    ],
+    "problem_type": "Criminal Act",
+    "problem_description": "bank heist",
+    "image_path": []
+  }
+}
+-- one image
+{
+  "body": {
+    "location": [
+      36.20914513392121,
+      -115.19957114599852
+    ],
+    "problem_type": "Criminal Act",
+    "problem_description": "bank heist",
+    "image_path": [
+      "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARSURBVBhXY/j/CQVRxv/EAACvCDCKJ2FhswAAAABJRU5ErkJggg=="
+    ]
+  }
+}
+-- multiple images
+{
+  "body": {
+    "location": [
+      36.20914513392121,
+      -115.19957114599852
+    ],
+    "problem_type": "Criminal Act",
+    "problem_description": "bank heist",
+    "image_path": [
+      "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARSURBVBhXY/j/CQVRxv/EAACvCDCKJ2FhswAAAABJRU5ErkJggg==",
+      "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAASSURBVBhXY1jsuQQZUcb3XAIAGxEnEfe2ak0AAAAASUVORK5CYII="
+    ]
+  }
+}
+
+DeleteEmployee:
+- too many fields
+{
+  "id": 7,
+  "other": "i just wanna test this"
+}
+- type error
+{
+  "id": "the one that is quitting"
+}
+- invalid id 
+{
+  "id": 999999
+}
+- SUCCESS
+{
+  "id": 1
+}
+
+ReadProblem:
+- invalid params
+-- id
+{
+  "queryStringParameters": {
+    "id": "what"
+  }
+}
+{
+  "queryStringParameters": {
+    "id": 999999
+  }
+}
+-- problem type
+{
+  "queryStringParameters": {
+    "problem_type": "test"
+  }
+}
+-- problem description
+{
+  "queryStringParameters": {
+    "problem_description": 7
+  }
+}
+
+-- invalid time
+{
+  "queryStringParameters": {
+    "time_found": [
+      "2021-07-07 17:29:16",
+      "2021-07-07 17:29:14"
+    ]
+  }
+}
+{
+  "queryStringParameters": {
+    "time_found": [
+      "2021-07-07 17-29-14",
+      "2021-07-07 17-29-16"
+    ]
+  }
+}
+{
+  "queryStringParameters": {
+    "time_found": [
+        "2021-07-07 17:29:14",
+        "2021-07-07 17:29:16",
+        "2021-07-07 17:29:18"
+        
+    ]
+  }
+}
+{
+  "queryStringParameters": {
+    "time_found": [
+        20210707172914,
+        20210707172916
+    ]
+  }
+}
+{
+  "queryStringParameters": {
+    "time_found": [
+        "2021-07-07 17:29:14:1234",
+        "2021-07-07 17:29:16:5678"
+    ]
+  }
+}
+{
+  "queryStringParameters": {
+      "current_status": "haha"
+  }
+}
+-- location & distance
+{
+  "queryStringParameters": {
+      "location": [
+          36.2091451339212,
+          -115.199571145999
+          ],
+      "distance": -1
+  }
+}
+{
+  "queryStringParameters": {
+      "location": [
+          136.2091451339212,
+          -115.199571145999
+          ],
+      "distance": 7
+  }
+}
+{
+  "queryStringParameters": {
+      "location": [
+          36.2091451339212,
+          -115.199571145999
+          ],
+      "distance": "close"
+  }
+}
+-- location
+{
+  "queryStringParameters": {
+      "location": [
+          36.2091451339212,
+          -115.199571145999
+          ]
+  }
+}
+-- distance
+{
+  "queryStringParameters": {
+      "distance": 5
+  }
+}
+-- image path
+{
+  "queryStringParameters": {
+      "image_path": 5
+  }
+}
+- SUCCESS:
+-- full params
+{
+  "queryStringParameters": {
+    "id": 1,
+    "problem_type": "Fire",
+    "problem_description": "bonfire spreading in main square",
+    "time_found": [
+      "2021-07-07 17:29:14",
+      "2021-07-07 17:29:16"
+    ],
+    "current_status": "Open",
+    "location": [
+        36.2091451339212,
+        -115.199571145999
+    ],
+    "distance": 0.01,
+    "image_path": "https://s3.console.aws.amazon.com/s3/buckets/smartcitytestbucket?region=us-east-1&prefix=1/"
+  }
+}
+-- id
+{
+  "queryStringParameters": {
+      "id": 1
+  }
+}
+-- problem type
+{
+  "queryStringParameters": {
+      "problem_type": "Road Hazard"
+  }
+}
+-- problem description
+{
+  "queryStringParameters": {
+      "problem_description": "bank heist - near the fam"
+  }
+}
+-- time found
+{
+  "queryStringParameters": {
+    "time_found": [
+      "2021-07-07 17:29:14",
+      "2021-07-07 17:29:16"
+    ]
+  }
+}
+-- location & distance
+{
+  "queryStringParameters": {
+      "location": [ 42.33716172435218, -71.19064821275492 ],
+      "distance": 2
+  }
+}
+-- image path
+{
+  "queryStringParameters": {
+    "image_path": "https://s3.console.aws.amazon.com/s3/buckets/smartcitytestbucket?prefix=108/"
+  }
+}
+
+UpdateProblem:
+- not enough fields
+{
+  "id": 1,
+  "current_status": "In Progress"
+}
+- type errors
+{
+  "id": "that one",
+  "current_status": "In Progress",
+  "employee_id": 1
+}
+{
+  "id": 1,
+  "current_status": 1,
+  "employee_id": 1
+}
+{
+  "id": 1,
+  "current_status": "In Progress",
+  "employee_id": "the best one"
+}
+- invalid input
+{
+  "id": 99999,
+  "current_status": "In Progress",
+  "employee_id": 1
+}
+{
+  "id": 1,
+  "current_status": "yay",
+  "employee_id": 1
+}
+{
+  "id": 1,
+  "current_status": "In Progress",
+  "employee_id": 99999
+}
+- invalid request
+-- current==previous
+{
+  "id": 1,
+  "current_status": "Open",
+  "employee_id": 1
+}
+-- type!=department
+{
+  "id": 1,
+  "current_status": "In Progress",
+  "employee_id": 2
+}
+- SUCCESS (Log!)
+-- Open->IP (UpdateEmployee+Problem)
+{
+  "id": 1,
+  "current_status": "In Progress",
+  "employee_id": 1
+}
+-- IP->Open (UpdateEmployee+Problem)
+{
+  "id": 1,
+  "current_status": "Open",
+  "employee_id": 1
+}
+-- Open->Complete (DeleteProblem)
+{
+  "id": 1,
+  "current_status": "Complete",
+  "employee_id": 1
+}
+-- IP->Complete (UpdateEmployee+DeleteProblem)
+{
+  "id": 3,
+  "current_status": "Complete",
+  "employee_id": 1
+}
