@@ -115,15 +115,22 @@ public class SmartCityController {
     }
 
     @PostMapping("/report")
-    public String handleFileUpload(@RequestParam("image") MultipartFile file, @RequestParam("problemType") String problemType,
+    public String handleFileUpload(@RequestParam("image") MultipartFile[] files, @RequestParam("problemType") String problemType,
                                    @RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
                                    @RequestParam("problemDescription") String problemDescription) throws IOException {
-        System.out.println("You successfully uploaded " + file.getOriginalFilename() + "\nproblem type = " + problemType +
-                "\nlatitude = " + latitude + "\nlongitude = " + longitude + "\nproblem description = " + problemDescription);
         WebClient client = WebClient.create("https://81ssn0783l.execute-api.us-east-1.amazonaws.com/deployedStage");
         WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.method(HttpMethod.POST);
         WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");
-        String bodyString = "{\"problem_type\":\""+problemType+"\",\"location\":["+latitude+","+longitude+"],\"problem_description\":\""+problemDescription+"\",\"image_path\":[\""+Base64.getEncoder().encodeToString(file.getBytes())+"\"]}";
+        String fileString = "";
+        for (int i = 0; i < files.length; i++) {
+            fileString = fileString + "\"";
+            fileString = fileString + Base64.getEncoder().encodeToString(files[i].getBytes());
+            fileString = fileString + "\"";
+            if (files.length != 1 && i != files.length - 1) {
+                fileString = fileString + ",";
+            }
+        }
+        String bodyString = "{\"problem_type\":\""+problemType+"\",\"location\":["+latitude+","+longitude+"],\"problem_description\":\""+problemDescription+"\",\"image_path\":["+fileString+"]}";
         WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue(bodyString);
         Mono<String> resp = headersSpec.exchangeToMono(response -> {
             if (response.statusCode()
