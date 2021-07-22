@@ -26,7 +26,7 @@ def lambda_handler(event, context):
     search_results = search_problems(search)
     return {
         "statusCode": 200,
-        "body": "Search Results:\n" + json.dumps(search_results)
+        "body": json.dumps(search_results)
     }
 
 def mysql_connect():
@@ -78,14 +78,14 @@ def validate_input():
         search_list.append(f'problem_description = "{event_body["problem_description"]}"')
 
     if "time_found" in event_body:
-        event["time_found"] = event["time_found"].split(",")
+        event_body["time_found"] = event_body["time_found"].split(",")
         if len(event_body["time_found"]) != 2 or not all(isinstance(i, str) for i in event_body["time_found"]):
             return {
                 'statusCode': 400,
                 'body': "'time_found' takes a string of two 'times' seperated by a comma. 'time' is formatted as follows: YYYY-MM-DD HH:MM"
             }
         try:
-            time_list = [datetime.datetime.strptime(time, '%Y-%m-%dT%H:%M') for time in event["time_found"]]
+            time_list = [datetime.datetime.strptime(time, '%Y-%m-%dT%H:%M') for time in event_body["time_found"]]
         except ValueError:
             return {
                 'statusCode': 400,
@@ -113,16 +113,30 @@ def validate_input():
                 'statusCode': 400,
                 'body': "'location must always be paired with 'distance'"
             }
-        event['location'] = event['location'].split(",")
-        if len(event_body["location"]) != 2 or not all(isinstance(i, (int, float)) for i in event_body["location"]) or not -90 <= event_body["location"][0] <= 90 or not -180 <= event_body["location"][1] <= 180:
+        event_body["location"] = event_body['location'].split(",")
+        try:
+            event_body["location"] = [float(i) for i in event_body["location"]]
+        except ValueError:
             return {
                 'statusCode': 400,
-                'body': "'location' takes a list of two points, both of type float. The first represents the latitude (which must be a number between -90 and 90) and the second represents the longitude (which must be a number between -180 and 180)"
+                'body': "'location' takes a string of two points (both of type float) seperated by a comma."            
             }
-        if not isinstance(event_body["distance"], (int, float)) or event_body["distance"] < 0:
+        if len(event_body["location"]) != 2 or not -90 <= event_body["location"][0] <= 90 or not -180 <= event_body["location"][1] <= 180:
             return {
                 'statusCode': 400,
-                'body': "'distance' must be a number that is at least 0"
+                'body': "'location' takes a string of two points (both of type float) seperated by a comma. The first represents the latitude (which must be a number between -90 and 90) and the second represents the longitude (which must be a number between -180 and 180)"
+            }
+        try:
+            event_body["distance"] = float(event_body["distance"])
+        except ValueError:
+            return {
+                'statusCode': 400,
+                'body': "'distance' must be a number."
+            }
+        if event_body["distance"] < 0:
+            return {
+                'statusCode': 400,
+                'body': "'distance' must be at least 0"
             }
         search_list.append(f'ST_Distance_Sphere(point({event_body["location"][1]}, {event_body["location"][0]}), location) <= {event_body["distance"] * 1000}')
 
@@ -156,17 +170,17 @@ def search_problems(search_string):
     data_json = []
     for data in data_list:
         data_dict = {
-            'id': data[0],
-            'problem_type': data[1],
-            'problem_description': data[2],
-            'time_found': str(data[3]),
-            'current_status': data[4]
+            'ID': data[0],
+            'Problem Type': data[1],
+            'Problem Description': data[2],
+            'Time Found': str(data[3]),
+            'Current Status': data[4]
         }
         mycursor.execute(f'SELECT ST_AsText(location) AS coordinates FROM problems WHERE id = {data[0]}')
         location = mycursor.fetchall()[0][0]
         location_list = location[6:-1].split()
         location_url = f'https://www.google.com/maps/search/?api=1&query={location_list[1]}%2C{location_list[0]}'
-        data_dict['location'] = location_url
-        data_dict['image_path'] = str(data[6])
+        data_dict['Location'] = location_url
+        data_dict['Image Path'] = str(data[6])
         data_json.append(data_dict)
     return data_json
