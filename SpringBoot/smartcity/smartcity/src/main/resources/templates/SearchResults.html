@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Find Issue</title>
+    <title>Search Results</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <style>
         body {
@@ -30,11 +30,18 @@
         tr:nth-child(odd) {
             background-color: white;
         }
+        button {
+            padding: 20px;
+            margin: 10px;
+            background-color: rgb(255, 255, 210);
+            border-radius: 10px;
+        }
+        button:hover {
+            cursor: pointer;
+            background-color: rgb(230, 230, 190);
+        }
     </style>
 </head>
-<!--var currentTxt = document.getElementById("message").innerHTML;
-currentTxt = "<h1>" + currentTxt + "</h1>";
-document.getElementById("message").innerHTML = currentTxt;-->
 <body onload="
 const results = JSON.parse(document.getElementById('message').innerHTML)[0];
 var _table_ = document.createElement('table'),
@@ -86,16 +93,6 @@ return columnSet;
 document.body.appendChild(buildHtmlTable(results));
 ">
 <h1 id="header">Search Results</h1>
-<!--<table border="1">
-    <tr>
-        <td>Employee First Name</td>
-        <td>Employee Last Name</td>
-    </tr>
-    <tr th:each="emp : ${message}">
-        <td th:text="${emp.id}">First Name</td>
-        <td th:text="${emp.problem_type}">Last Name</td>
-    </tr>
-</table>-->
 <div th:if="${message}">
     <h2 id ="message" th:text="${message}"/>
 </div>

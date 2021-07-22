@@ -1,7 +1,6 @@
 package com.smartcity.smartcity;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -35,7 +34,6 @@ public class SmartCityController {
         private String latitude;
         private String longitude;
         private String problemDescription;
-        private File image;
         private String status;
         private String startTime;
         private String endTime;
@@ -86,14 +84,6 @@ public class SmartCityController {
 
         public void setProblemDescription(String problemDescription) {
             this.problemDescription = problemDescription;
-        }
-
-        public File getImage() {
-            return image;
-        }
-
-        public void setImage(File image) {
-            this.image = image;
         }
 
         public String getStatus() {
@@ -164,7 +154,6 @@ public class SmartCityController {
         System.out.println("Distance: " + body.getDistance());
         System.out.println("Latitude: " + body.getLatitude());
         System.out.println("Longitude: " + body.getLongitude());
-        System.out.println("Image: " + body.getImage());
         System.out.println("Status: " + body.getStatus());
         System.out.println("Start Time: " + body.getStartTime());
         System.out.println("End Time: " + body.getEndTime());*/
@@ -185,6 +174,9 @@ public class SmartCityController {
         }
         if (!body.getStatus().equals("Any")) {
             queryParams.put("current_status", Arrays.asList(body.getStatus()));
+        }
+        if (!body.getStartTime().equals("") && !body.getEndTime().equals("")) {
+            queryParams.put("time_found", Arrays.asList(body.getStartTime() + "," + body.getEndTime()));
         }
 
         WebClient client = WebClient
