@@ -292,3 +292,73 @@ Resources:
       - SmartCityDB
       - MySQLSecret
       - MySQLSecretHost
+  SmartCityDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: SmartCityDashboard
+      DashboardBody: !Sub >-
+        {
+          "widgets": [
+            {
+              "height": 6,
+              "width": 6,
+              "x": 0,
+              "y": 0,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", "${!'{{resolve:secretsmanager:${MySQLSecret}:SecretString:dbInstanceIdentifier}}", { "label": "CPU Utilization" } ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "RDS CPU Utilization",
+                "period": 300,
+                "stat": "Average"
+              }
+            },
+            {
+              "height": 6,
+              "width": 9,
+              "x": 6,
+              "y": 0,
+              "type": "metric",
+              "properties": {
+                "metrics": [
+                  [ "AWS/Lambda", "Errors", "FunctionName", "CloudFormation-AddEmployee" ],
+                  [ "...", "CloudFormation-AddProblem" ],
+                  [ "...", "CloudFormation-DeleteEmployee" ],
+                  [ "...", "CloudFormation-DeleteProblem" ],
+                  [ "...", "CloudFormation-Emailer" ],
+                  [ "...", "CloudFormation-LogProblem" ],
+                  [ "...", "CloudFormation-ReadProblem" ],
+                  [ "...", "CloudFormation-UpdateProblem" ]
+                ],
+                "view": "timeSeries",
+                "stacked": false,
+                "region": "${AWS::Region}",
+                "title": "Lambda Errors",
+                "period": 300,
+                "stat": "Average"
+              }
+            },
+            {
+              "type": "metric",
+              "height": 6,
+              "width": 9,
+              "x": 15,
+              "y": 0,
+              "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                  [ "AWS/ApiGateway", "5XXError", "ApiName", "SmartCityAPIGateway" ],
+                  [ ".", "Count", ".", "." ],
+                  [ ".", "4XXError", ".", "." ]
+                ],
+                "region": "${AWS::Region}",
+                "title": "HTTP Responses"
+              }
+            }
+          ]
+        }
