@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: "Deploys Smart-City containing: API Gateway with Lambda integrations, MySQL database with tables, and credentials from SecretsManager. For more information see our project at https://github.com/meirjacobs/Smart-City"
+Description: "Deploys Smart-City containing: API Gateway with Lambda integrations, MySQL database with tables, credentials from SecretsManager, and a CloudWatch Dashboard to monitor these resources. For more information see our project at https://github.com/meirjacobs/Smart-City"
 Parameters:
   ResourcesBucket:
     Type: String
