@@ -153,6 +153,9 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-ReadProblem
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref SmartCityS3Bucket
       CodeUri:
         Bucket: !Ref ResourcesBucket
         Key: lambdas.zip
