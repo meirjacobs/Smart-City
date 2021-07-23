@@ -94,7 +94,7 @@ def validate_input():
         if time_list[0] >= time_list[1]:
             return {
                 'statusCode': 400,
-                'body': "The second time must be later than the first. 'time' is formatted as follows: YYYY-MM-DDTHH:MM"
+                'body': "The second time must be later than the first. 'time' is formatted as follows: YYYY-MM-DD HH:MM"
             }
         search_list.append(f'time_found BETWEEN "{event_body["time_found"][0]}" AND "{event_body["time_found"][1]}"')
 
