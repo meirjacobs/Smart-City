@@ -54,7 +54,7 @@ def validate_input():
     if len(event_body) != 4:
         return {
             'statusCode': 400,
-            'body': f'Four items requires. Received {len(event_body)}.\nInput: {json.dumps(event_body)}'
+            'body': f'Four items required. Received {len(event_body)}.\nInput: {json.dumps(event_body)}'
         }
 
     problem_type_list = ['Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', 'Other']
