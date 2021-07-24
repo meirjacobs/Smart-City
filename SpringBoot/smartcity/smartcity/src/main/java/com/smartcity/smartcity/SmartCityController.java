@@ -147,6 +147,7 @@ public class SmartCityController {
 
     @PostMapping("/find")
     public String submitFind(@ModelAttribute("data") GetData body, RedirectAttributes redirectAttributes) {
+        System.out.println("find");
         /*System.out.println("--FIND--");
         System.out.println("ID: " + body.getId());
         System.out.println("Problem Type: " + body.getProblemType());
@@ -178,7 +179,7 @@ public class SmartCityController {
         if (!body.getStartTime().equals("") && !body.getEndTime().equals("")) {
             queryParams.put("time_found", Arrays.asList(body.getStartTime() + "," + body.getEndTime()));
         }
-
+//        System.out.println(queryParams);
         WebClient client = WebClient
                 .builder()
                 .baseUrl(env.getProperty("apiURL"))
@@ -198,7 +199,12 @@ public class SmartCityController {
         redirectAttributes.addFlashAttribute("message", results);
         //System.out.println(results);
 
-        return "redirect:/results";
+        return "redirect:/find";
+    }
+
+    @GetMapping("/login")
+    public String getLoginPage() {
+        return "login";
     }
 
     @GetMapping("/results")
