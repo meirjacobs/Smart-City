@@ -179,7 +179,7 @@ public class SmartCityController {
         if (!body.getStartTime().equals("") && !body.getEndTime().equals("")) {
             queryParams.put("time_found", Arrays.asList(body.getStartTime() + "," + body.getEndTime()));
         }
-//        System.out.println(queryParams);
+        //System.out.println(queryParams);
         WebClient client = WebClient
                 .builder()
                 .baseUrl(env.getProperty("apiURL"))
@@ -208,7 +208,7 @@ public class SmartCityController {
     }
 
     @GetMapping("/results")
-    public String getResultsPage(/*@ModelAttribute("message") String message*/) {
+    public String getResultsPage() {
         return "SearchResults";
     }
 

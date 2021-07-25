@@ -32,7 +32,7 @@
         }
         #map {
             width:400px; height: 200px;
-            }
+        }
     </style>
 
 </head>
@@ -51,17 +51,14 @@
             <option>Water Damage</option>
             <option>Other</option>
         </select></div>
-    <div>Location: Latitude <input type="number" id="latitude" step="any" name="latitude">, Longitude <input type="number" id="longitude" step="any" name="longitude" >
-        <div id="map"></div>
-        <!-- <div>Latidude: <input type="text" id="latitude" readonly="yes"></div>
-        <div>Longitude: <input type="text" id="longitude" readonly="yes"></div> -->
-
-        <div>Problem Description: <input name="problemDescription"></div>
-        <div>Images: <input name="image" type="file" multiple></div>
-        <div id="button-container"><input id="submit" type="submit"></div>
+    <div>Location: Latitude <input type="number" id="latitude" step="any" name="latitude" value="40.77864253611675">, Longitude <input type="number" id="longitude" step="any" name="longitude" value="-73.9610921231848"></div>
+    <div id="map"></div>
+    <div>Problem Description: <input name="problemDescription"></div>
+    <div>Images: <input name="image" type="file" multiple></div>
+    <div id="button-container"><input id="submit" type="submit"></div>
 </form>
 <script >
-    //map.js
+//map.js
 
 //Set up some of our variables.
 var map; //Will contain map object.
@@ -76,8 +73,8 @@ function initMap() {
 
     //Map options.
     var options = {
-      center: centerOfMap, //Set center.
-      zoom: 3 //The zoom value.
+        center: centerOfMap, //Set center.
+        zoom: 3 //The zoom value.
     };
 
     //Create the map object.
