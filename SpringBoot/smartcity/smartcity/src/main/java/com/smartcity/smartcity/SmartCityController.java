@@ -199,7 +199,7 @@ public class SmartCityController {
         redirectAttributes.addFlashAttribute("message", results);
         //System.out.println(results);
 
-        return "redirect:/find";
+        return "redirect:/results";
     }
 
     @GetMapping("/login")

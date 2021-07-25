@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBEMFMGUS0w_pLlpBBUVwmNTP2FyECsmkE"></script>
     <title>Report Issue</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <style>
@@ -29,41 +30,98 @@
         #button-container {
             text-align: center;
         }
+        #map {
+            width:400px; height: 200px;
+            }
     </style>
+
 </head>
 <body>
+
 <h1 id="header">Report Issue</h1>
 <div>Thank you for taking the time to report an issue. All fields (besides for Images) are required:</div>
 <form th:action="@{/report}" enctype="multipart/form-data" method="post">
-<div>Problem Type:
-    <select name="problemType">
-        <option>Road Hazard</option>
-        <option>Criminal Act</option>
-        <option>Environmental Hazard</option>
-        <option>Vehicle Damage</option>
-        <option>Fire</option>
-        <option>Water Damage</option>
-        <option>Other</option>
-    </select></div>
-<div>Location: Latitude <input type="number" id="latitude" step="any" name="latitude" value="25.123">, Longitude <input type="number" id="longitude" step="any" name="longitude" value="50.456"><!--<button onClick="getLocation">Current Location</button>--></div>
-<div>Problem Description: <input name="problemDescription"></div>
-<div>Images: <input name="image" type="file" multiple></div>
-<div id="button-container"><input id="submit" type="submit"></div>
+    <div>Problem Type:
+        <select name="problemType">
+            <option>Road Hazard</option>
+            <option>Criminal Act</option>
+            <option>Environmental Hazard</option>
+            <option>Vehicle Damage</option>
+            <option>Fire</option>
+            <option>Water Damage</option>
+            <option>Other</option>
+        </select></div>
+    <div>Location: Latitude <input type="number" id="latitude" step="any" name="latitude">, Longitude <input type="number" id="longitude" step="any" name="longitude" >
+        <div id="map"></div>
+        <!-- <div>Latidude: <input type="text" id="latitude" readonly="yes"></div>
+        <div>Longitude: <input type="text" id="longitude" readonly="yes"></div> -->
+
+        <div>Problem Description: <input name="problemDescription"></div>
+        <div>Images: <input name="image" type="file" multiple></div>
+        <div id="button-container"><input id="submit" type="submit"></div>
 </form>
-<!--<script>
-var latitude = document.getElementById("latitude");
-var longitude = document.getElementById("longitude");
+<script >
+    //map.js
 
-function getLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(showPosition);
-  }
+//Set up some of our variables.
+var map; //Will contain map object.
+var marker = false; ////Has the user plotted their location marker?
+
+//Function called to initialize / create the map.
+//This is called when the page has loaded.
+function initMap() {
+
+    //The center location of our map.
+    var centerOfMap = new google.maps.LatLng(40.77864253611675, -73.9610921231848);
+
+    //Map options.
+    var options = {
+      center: centerOfMap, //Set center.
+      zoom: 3 //The zoom value.
+    };
+
+    //Create the map object.
+    map = new google.maps.Map(document.getElementById('map'), options);
+
+    //Listen for any clicks on the map.
+    google.maps.event.addListener(map, 'click', function(event) {
+        //Get the location that the user clicked.
+        var clickedLocation = event.latLng;
+        //If the marker hasn't been added.
+        if(marker === false){
+            //Create the marker.
+            marker = new google.maps.Marker({
+                position: clickedLocation,
+                map: map,
+                draggable: true //make it draggable
+            });
+            //Listen for drag events!
+            google.maps.event.addListener(marker, 'dragend', function(event){
+                markerLocation();
+            });
+        } else{
+            //Marker has already been added, so just change its location.
+            marker.setPosition(clickedLocation);
+        }
+        //Get the marker's location.
+        markerLocation();
+    });
 }
 
-function showPosition(position) {
-  latitude.value = position.coords.latitude;
-  longitude.value = positions.coords.longitude;
+//This function will get the marker's current location and then add the latitude/long
+//values to our textfields so that we can save the location.
+function markerLocation(){
+    //Get location.
+    var currentLocation = marker.getPosition();
+    //Add latitude and longitude values to a field that we can save.
+    document.getElementById('latitude').value = currentLocation.lat(); //latitude
+    document.getElementById('longitude').value = currentLocation.lng(); //longitude
 }
-</script>-->
+
+
+//Load the map when the page has finished loading.
+google.maps.event.addDomListener(window, 'load', initMap);
+</script>
+
 </body>
 </html>
