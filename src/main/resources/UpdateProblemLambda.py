@@ -11,7 +11,7 @@ mycursor = None
 def lambda_handler(event, context):
 
     global event_body
-    event_body = event
+    event_body = json.loads(event["body"])
 
     # check input to ensure it is valid
     invalid_size = validate_input_size()
@@ -39,7 +39,7 @@ def validate_input_size():
     if len(event_body) != 3:
         return {
             'statusCode': 400,
-            'body': f'Three items requires. Received {len(event_body)}.\nInput: {json.dumps(event_body)}'
+            'body': f'Three items required. Received {len(event_body)}.\nInput: {json.dumps(event_body)}'
         }
     
 def mysql_connect():
@@ -71,7 +71,7 @@ def validate_input():
     if id_number not in id_list:
         return {
             'statusCode': 400,
-            'body': f"The ID {id_number} you requested is not in the problems table"
+            'body': "The ID you requested is not in the problems table"
         }
     
     # validate employee id
@@ -87,7 +87,7 @@ def validate_input():
     if employee_id not in employee_id_list:
         return {
             'statusCode': 400,
-            'body': f"The ID {employee_id} you requested is not in the employees table"
+            'body': f"The ID you requested is not in the employees table"
         }
 
     # validate current_status
