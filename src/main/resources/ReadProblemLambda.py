@@ -1,5 +1,6 @@
 import datetime
 import json
+import os
 
 import boto3
 
@@ -181,6 +182,8 @@ def search_problems(search_string):
         location_list = location[6:-1].split()
         location_url = f'https://www.google.com/maps/search/?api=1&query={location_list[1]}%2C{location_list[0]}'
         data_dict['Location'] = location_url
-        data_dict['Image Path'] = str(data[6])
+        bucket = os.environ["BUCKET_NAME"]
+        s3_client = boto3.client('s3')
+        data_dict['Image Path'] = s3_client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': f'{data[0]}/img0.jpg'}, ExpiresIn=3600)
         data_json.append(data_dict)
     return data_json
