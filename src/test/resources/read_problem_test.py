@@ -2,7 +2,6 @@ import json
 
 import pytest
 import urllib3
-from urllib3.packages.six import b
 
 http = urllib3.PoolManager()
 url = "https://rpixnvd51i.execute-api.us-east-1.amazonaws.com/deployedStage"
