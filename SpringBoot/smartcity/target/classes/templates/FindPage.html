@@ -39,42 +39,44 @@
 <h1 id="header">Find Issue</h1>
 <div>Please fill out at least one field:</div>
 <form th:action="@{/find}" th:object="${data}" method="post">
-<div> Issue ID #: <input type="number" min="0" value="0" step="1" name="id"></div>
-<div>Problem Type:
-    <select name="problemType">
-        <option>Any</option>
-        <option>Road Hazard</option>
-        <option>Criminal Act</option>
-        <option>Environmental Hazard</option>
-        <option>Vehicle Damage</option>
-        <option>Fire</option>
-        <option>Water Damage</option>
-        <option>Other</option>
-    </select></div>
-<div>Location: Within <input type="number" placeholder="1" name="distance"> km of Latitude <input id="latitude" type="number" step="any" name="latitude" value="40.77864253611675">, Longitude <input id="longitude" type="number" step="any" name="longitude" value="-73.9610921231848"></div>
-<div id="map"></div>
-<div>Problem Description: <input name="problemDescription"></div>
-<!--<div>Image: <input name="image" type="file"></div>-->
-<div>Current Status:
-    <select name="status">
-        <option value="Any">Any</option>
-        <option value="Open">Open</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Complete">Complete</option>
-    </select>
-</div>
-<div>Time Reported: Between <input type="datetime-local" name="startTime"> and <input type="datetime-local" name="endTime"></div>
-<div id="button-container"><input id="submit" type="submit"></div>
+    <div> Issue ID #: <input type="number" min="0" value="0" step="1" name="id"></div>
+    <div>Problem Type:
+        <select name="problemType">
+            <option>Any</option>
+            <option>Road Hazard</option>
+            <option>Criminal Act</option>
+            <option>Environmental Hazard</option>
+            <option>Vehicle Damage</option>
+            <option>Fire</option>
+            <option>Water Damage</option>
+            <option>Other</option>
+        </select></div>
+    <div>Location: Within <input type="number" placeholder="1" name="distance"> km of Latitude <input id="latitude" type="number" step="any" name="latitude" value="40.77864253611675">, Longitude <input id="longitude" type="number" step="any" name="longitude" value="-73.9610921231848"></div>
+    <div> <button type="button" id = "current_location" return false>Use Current Location</button></div>
+    <div id="map"></div>
+    <div>Problem Description: <input name="problemDescription"></div>
+    <!--<div>Image: <input name="image" type="file"></div>-->
+    <div>Current Status:
+        <select name="status">
+            <option value="Any">Any</option>
+            <option value="Open">Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Complete">Complete</option>
+        </select>
+    </div>
+    <div>Time Reported: Between <input type="datetime-local" name="startTime"> and <input type="datetime-local" name="endTime"></div>
+    <div id="button-container"><input id="submit" type="submit"></div>
 </form>
 <script >
-//map.js
-
 //Set up some of our variables.
 var map; //Will contain map object.
 var marker = false; ////Has the user plotted their location marker?
 
 //Function called to initialize / create the map.
 //This is called when the page has loaded.
+var x = document.getElementById("latitude");
+var y = document.getElementById("longitude");
+
 function initMap() {
 
     //The center location of our map.
@@ -82,17 +84,65 @@ function initMap() {
 
     //Map options.
     var options = {
-        center: centerOfMap, //Set center.
-        zoom: 3 //The zoom value.
+      center: centerOfMap, //Set center.
+      zoom: 3 //The zoom value.
     };
 
     //Create the map object.
     map = new google.maps.Map(document.getElementById('map'), options);
 
     //Listen for any clicks on the map.
+
+    document.getElementById("current_location").addEventListener("click", function() {
+        console.log("current location")
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(getPosition);
+
+          } else {
+            x.innerHTML = "Geolocation is not supported by this browser.";
+          }
+
+    });
+
+
+function getPosition(position) {
+    //document.getElementById("map").click();
+    console.log("second?")
+
+    //Map options.
+
+    x.value = position.coords.latitude;
+    y.value = position.coords.longitude;
+    console.log(x.value);
+    var position = new google.maps.LatLng(x.value,y.value);
+    //var currentLocation = {lat: x, lng: y};
+    if(marker === false){
+        console.log("marker")
+        //Create the marker.
+        marker = new google.maps.Marker({
+            position: position,
+             map:map,
+            draggable: true //make it draggable
+        });
+        map.setCenter(position);
+        map.setZoom(3);
+
+    } else{
+        marker.setPosition(position)
+        map.setCenter(position);
+        map.setZoom(3);
+        //Marker has already been added, so just change its location.
+
+}
+    //Get the marker's location.
+    }
+
     google.maps.event.addListener(map, 'click', function(event) {
+        console.log("first?")
+        console.log(event);
         //Get the location that the user clicked.
         var clickedLocation = event.latLng;
+        console.log(event.latLng)
         //If the marker hasn't been added.
         if(marker === false){
             //Create the marker.
@@ -108,10 +158,10 @@ function initMap() {
         } else{
             //Marker has already been added, so just change its location.
             marker.setPosition(clickedLocation);
-        }
+    }
         //Get the marker's location.
-        markerLocation();
-    });
+       markerLocation();
+   });
 }
 
 //This function will get the marker's current location and then add the latitude/long
@@ -126,7 +176,7 @@ function markerLocation(){
 
 
 //Load the map when the page has finished loading.
-google.maps.event.addDomListener(window, 'load', initMap);
+google.maps.event.addDomListener(window, 'load', initMap());
 </script>
 </body>
 </html>
