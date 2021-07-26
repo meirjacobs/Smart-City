@@ -177,7 +177,7 @@ def search_problems(search_string):
             'Time Found': str(data[3]),
             'Current Status': data[4]
         }
-        mycursor.execute(f'SELECT ST_AsText(location) AS coordinates FROM problems WHERE id = {data[0]}')
+        mycursor.execute(f'SELECT ST_AsText(location) FROM problems WHERE id = {data[0]}')
         location = mycursor.fetchall()[0][0]
         location_list = location[6:-1].split()
         location_url = f'https://www.google.com/maps/search/?api=1&query={location_list[1]}%2C{location_list[0]}'

@@ -183,5 +183,5 @@ def update_tables():
     
     return {
         'statusCode' : 200,
-        'string': f'Success! ID {event_body["id_number"]} updated to {event_body["current_status"]}'
+        'body': f'Success! ID {event_body["id_number"]} updated to {event_body["current_status"]}'
     }

@@ -32,7 +32,7 @@ def lambda_handler(event, context):
 
     return {
         'statusCode' : 200,
-        'response': f"Success, inserted {event_body['first_name']} {event_body['last_name']} into table"
+        'body': f"Success, inserted {event_body['first_name']} {event_body['last_name']} into table"
     }
 
 def validate_input():

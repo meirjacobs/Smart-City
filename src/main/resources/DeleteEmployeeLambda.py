@@ -35,7 +35,7 @@ def lambda_handler(event, context):
 
     return {
         'statusCode' : 200,
-        'response': f'Success, deleted: {data} from the table'
+        'body': f'Success, deleted: {data} from the table'
     }
 
 def validate_input():

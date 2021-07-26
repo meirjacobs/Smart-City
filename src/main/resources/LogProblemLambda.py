@@ -26,5 +26,5 @@ def lambda_handler(event, context):
 
     return {
         'statusCode' : 200,
-        'response': "Success, logs updated"
+        'body': "Success, logs updated"
     }

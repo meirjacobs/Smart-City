@@ -50,6 +50,21 @@ Resources:
           - lambdaArn: !GetAtt AddProblem.Arn
       ResourceId: !GetAtt SmartCityAPIGateway.RootResourceId
       RestApiId: !Ref SmartCityAPIGateway
+  ApiGatewayPut:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: PUT
+      Integration:
+        IntegrationHttpMethod: POST
+        IntegrationResponses:
+          - StatusCode: 200
+        Type: AWS_PROXY
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !GetAtt UpdateProblem.Arn
+      ResourceId: !GetAtt SmartCityAPIGateway.RootResourceId
+      RestApiId: !Ref SmartCityAPIGateway
   ApiGatewayGet:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -85,6 +100,7 @@ Resources:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
       - ApiGatewayPost
+      - ApiGatewayPut
       - ApiGatewayGet
     Properties:
       RestApiId: !Ref SmartCityAPIGateway
@@ -94,6 +110,12 @@ Resources:
     Properties:
       Action: "lambda:InvokeFunction"
       FunctionName: !Ref AddProblem
+      Principal: "apigateway.amazonaws.com"
+  APILambdaPutPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !Ref UpdateProblem
       Principal: "apigateway.amazonaws.com"
   APILambdaGetPermission:
     Type: "AWS::Lambda::Permission"
