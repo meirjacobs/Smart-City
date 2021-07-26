@@ -1,3 +1,4 @@
+import datetime
 import json
 
 import pytest
@@ -178,14 +179,19 @@ def test_only_distance():
     assert response.data == b"'distance' must always be paired with 'location'"
 
 def test_full_param_search():
+    now = datetime.datetime.utcnow()
+    one_minute = datetime.timedelta(minutes=1)
+    start_time = datetime.datetime.strftime(now - one_minute, '%Y-%m-%dT%H:%M')
+    end_time = datetime.datetime.strftime(now + one_minute, '%Y-%m-%dT%H:%M')
+    time_query = f"{start_time},{end_time}"
     query = {
-        "id": 1,
-        "problem_type": "Road Hazard",
-        "problem_description": "bad guy",
-        "time_found": "2021-07-22T13:48,2021-07-22T13:50",
+        "id": 1, # figure out what to do with this
+        "problem_type": "Criminal Act",
+        "problem_description": "test - bank heist 1",
+        "time_found": time_query,
         "current_status": "Open",
-        "location": "25.123,50.456",
-        "distance": 0.01,
+        "location": "31.78087640916267,35.21962829400858",
+        "distance": 3,
         "image_path": 'https://s3.console.aws.amazon.com/s3/buckets/smartcitystack-smartcitys3bucket-21vjidos6mgc?prefix=1/'
   }
     response = http.request(
@@ -199,7 +205,7 @@ def test_full_param_search():
 
 def test_id():
     query = {
-        "id": 1
+        "id": 1 # figure out what to do with this
     }
     response = http.request(
         "GET",
@@ -211,7 +217,7 @@ def test_id():
 
 def test_problem_type():
     query = {
-        "problem_type": "Road Hazard"
+        "problem_type": "Criminal Act"
     }
     response = http.request(
         "GET",
@@ -219,11 +225,11 @@ def test_problem_type():
         fields = query
     )
     assert response.status == 200
-    # assert len(json.loads(response.data)) == 1
+    # assert len(json.loads(response.data)) == 3
 
 def test_problem_description():
     query = {
-        "problem_description": "bad guy"
+        "problem_description": "test - bank heist 2"
     }
     response = http.request(
         "GET",
@@ -232,10 +238,16 @@ def test_problem_description():
     )
     assert response.status == 200
     assert len(json.loads(response.data)) == 1
+    # assert response.data == b
 
 def test_time_found():
+    now = datetime.datetime.utcnow()
+    one_minute = datetime.timedelta(minutes=1)
+    start_time = datetime.datetime.strftime(now - one_minute, '%Y-%m-%dT%H:%M')
+    end_time = datetime.datetime.strftime(now + one_minute, '%Y-%m-%dT%H:%M')
+    time_query = f"{start_time},{end_time}"
     query = {
-        "time_found": "2021-07-22T13:48,2021-07-22T13:50"
+        "time_found": time_query
     }
     response = http.request(
         "GET",
@@ -243,12 +255,13 @@ def test_time_found():
         fields = query
     )
     assert response.status == 200
-    assert len(json.loads(response.data)) == 1
+    assert len(json.loads(response.data)) == 3
+    # assert response.data == b
 
-def test_location_distance(): # put several points 2km of eachother and ensure length
+def test_location_distance():
     query = {
-        "location": "25.123,50.456",
-        "distance": 2,
+        "location": "31.78087640916267,35.21962829400858",
+        "distance": 3
     }
     response = http.request(
         "GET",
@@ -256,9 +269,9 @@ def test_location_distance(): # put several points 2km of eachother and ensure l
         fields = query
     )
     assert response.status == 200
-    # assert len(json.loads(response.data)) == 1
+    # assert len(json.loads(response.data)) == 3
 
-def test_image_path():
+def test_image_path(): # fix for updated url
     query = {
         "image_path": 'https://s3.console.aws.amazon.com/s3/buckets/smartcitystack-smartcitys3bucket-21vjidos6mgc?prefix=1/'
     }

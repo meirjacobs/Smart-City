@@ -98,9 +98,9 @@ def test_invalid_image_path():
 
 def test_no_image():
     test_body = {
-        "location": [36.20914513392121, -115.19957114599852],
+        "location": [31.77715670567932, 35.234471536758164],
         "problem_type": "Criminal Act",
-        "problem_description": "bank heist",
+        "problem_description": "test - bank heist 1",
         "image_path": [""]
     }
     response = http.request(
@@ -113,9 +113,9 @@ def test_no_image():
 
 def test_one_image():
     test_body = {
-        "location": [36.20914513392121, -115.19957114599852],
+        "location": [31.772476274945593, 35.20411435593286],
         "problem_type": "Criminal Act",
-        "problem_description": "bank heist",
+        "problem_description": "test - bank heist 2",
         "image_path": ["iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARSURBVBhXY/j/CQVRxv/EAACvCDCKJ2FhswAAAABJRU5ErkJggg=="]
     }
     response = http.request(
@@ -128,9 +128,9 @@ def test_one_image():
 
 def test_multiple_images():
     test_body = {
-        "location": [36.20914513392121, -115.19957114599852],
+        "location": [31.788206782571194, 35.21833711571499],
         "problem_type": "Criminal Act",
-        "problem_description": "bank heist",
+        "problem_description": "test - bank heist 3",
         "image_path": [
             "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAARSURBVBhXY/j/CQVRxv/EAACvCDCKJ2FhswAAAABJRU5ErkJggg==",
             "iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAIAAAACDbGyAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAASSURBVBhXY1jsuQQZUcb3XAIAGxEnEfe2ak0AAAAASUVORK5CYII="
