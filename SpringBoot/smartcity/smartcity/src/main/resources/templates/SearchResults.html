@@ -62,6 +62,12 @@ td.appendChild(document.createTextNode(arr[i][columns[j]] || ''));
 if (td.textContent.substring(0, 22) == ('https://www.google.com')) {
 td.innerHTML = '<a target=\'_blank\' href=\'' + td.textContent + '\'>Location</a>';
 } else if (td.textContent.substring(0, 5) == ('https')) {
+//var links = td.textContent.split('|');
+//var linkText = '';
+//for (var i = 0; i < links.length - 1; i++) {
+//linkText += '<a href=\'' + links[i] + '\'>Image</a><br>'
+//}
+//td.innerHTML = linkText;
 td.innerHTML = '<a target=\'_blank\' href=\'' + td.textContent + '\'>Image</a>';
 }
 tr.appendChild(td);

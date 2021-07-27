@@ -147,7 +147,6 @@ public class SmartCityController {
 
     @PostMapping("/find")
     public String submitFind(@ModelAttribute("data") GetData body, RedirectAttributes redirectAttributes) {
-        System.out.println("find");
         /*System.out.println("--FIND--");
         System.out.println("ID: " + body.getId());
         System.out.println("Problem Type: " + body.getProblemType());
