@@ -1,11 +1,13 @@
 import datetime
 import json
 
+import mysql.connector
 import pytest
 import urllib3
 
 http = urllib3.PoolManager()
 url = "https://rpixnvd51i.execute-api.us-east-1.amazonaws.com/deployedStage"
+
 
 def test_invalid_id_type():
     query = {
@@ -179,15 +181,19 @@ def test_only_distance():
     assert response.data == b"'distance' must always be paired with 'location'"
 
 def test_full_param_search():
+    insert = "INSERT INTO problems (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
+    val = ("Road Hazard", "test - street sign in middle of the road", 35.21962829400858, 31.78087640916267, "https://www.test.com/1")
+    mycursor.execute(insert, val)
     now = datetime.datetime.utcnow()
     one_minute = datetime.timedelta(minutes=1)
     start_time = datetime.datetime.strftime(now - one_minute, '%Y-%m-%dT%H:%M')
     end_time = datetime.datetime.strftime(now + one_minute, '%Y-%m-%dT%H:%M')
     time_query = f"{start_time},{end_time}"
+    id_number = get_id_number()
     query = {
-        "id": 1, # figure out what to do with this
-        "problem_type": "Criminal Act",
-        "problem_description": "test - bank heist 1",
+        "id": id_number, # figure out what to do with this
+        "problem_type": "Road Hazard",
+        "problem_description": "test - street sign in middle of the road",
         "time_found": time_query,
         "current_status": "Open",
         "location": "31.78087640916267,35.21962829400858",
@@ -202,6 +208,7 @@ def test_full_param_search():
     assert response.status == 200
     assert len(json.loads(response.data)) == 1
     # assert response.data == b
+    clean_up(id_number=id_number)
 
 def test_id():
     query = {

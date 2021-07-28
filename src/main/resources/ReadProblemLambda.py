@@ -184,6 +184,15 @@ def search_problems(search_string):
         data_dict['Location'] = location_url
         bucket = os.environ["BUCKET_NAME"]
         s3_client = boto3.client('s3')
-        data_dict['Image Path'] = s3_client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': f'{data[0]}/img0.jpg'}, ExpiresIn=3600)
+        if data[6] == None:
+            data_dict['Image Path'] = "No Image Provided"
+        else:
+            img_links = ""
+            imgs = s3_client.list_objects_v2(Bucket=bucket, Prefix=f'{data[0]}/')
+            imgs = imgs.get("Contents", {})
+            for img in imgs:
+                img_links += s3_client.generate_presigned_url('get_object', Params={'Bucket': bucket, 'Key': img["Key"]}, ExpiresIn=3600) + "|"
+            data_dict['Image Path'] = img_links
+
         data_json.append(data_dict)
     return data_json
