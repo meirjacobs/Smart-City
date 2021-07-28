@@ -18,9 +18,7 @@ Follow the instructions in the 'Parameters' section.
 
 3. Wait about 10 minutes for the Stack to finish deploying.
 
-4. Open a command line and run `docker pull ecrystal/smart_city_repository`. Then run `docker images` and copy the most recent image ID.
-Run `docker run -p 8080:8080 -e API_URL=api_gateway_link image_id`, but replace `api_gateway_link` with the Invoke URL to your API Gateway (see below for help)
-and replace `image_id` with the image ID that you copied. Don't use quotes.
+4. Open a command line and run `docker run -p 8080:8080 -e API_URL=api_gateway_link ecrystal/smart_city_repository:latest`, but replace `api_gateway_link` with the Invoke URL to your API Gateway (see below for help). Don't use quotes.
     * To find the URL to your API Gateway, visit the [API Gateway console](https://console.aws.amazon.com/apigateway/main/apis) and click SmartCityAPIGateway. On the left of the screen, click Stages. Click deployedStage. The URL next to Invoke URL is what you need.
 
 5. Open your browser of choice, visit [localhost:8080](https://localhost:8080), and enjoy.
