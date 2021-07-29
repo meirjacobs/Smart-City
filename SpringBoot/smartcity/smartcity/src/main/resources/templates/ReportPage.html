@@ -39,7 +39,7 @@
 <body>
 
 <h1 id="header">Report Issue</h1>
-<div>Thank you for taking the time to report an issue. All fields (besides for Images) are required:</div>
+<div>Thank you for taking the time to report an issue. Problem Type and Location are required:</div>
 <form th:action="@{/report}" enctype="multipart/form-data" method="post">
     <div>Problem Type:
         <select name="problemType">
@@ -56,7 +56,7 @@
         <button type="button" id = "current_location" return false>Use Current Location</button>
     </div>
     <div id="map"></div>
-    <div> Latitude <input type="number" readonly id="latitude" step="any" name="latitude" >, Longitude <input type="number" readonly id="longitude" step="any" name="longitude" ></div>
+    <div> Latitude <input type="number" id="latitude" step="any" name="latitude" >, Longitude <input type="number" id="longitude" step="any" name="longitude" ></div>
     <div>Problem Description: <input name="problemDescription"></div>
     <div>Images: <input name="image" type="file" multiple></div>
     <div id="button-container"><input id="submit" type="submit"></div>
