@@ -56,7 +56,7 @@
         <button type="button" id = "current_location" return false>Use Current Location</button>
     </div>
     <div id="map"></div>
-    <div> Latitude <input type="number" id="latitude" step="any" name="latitude" >, Longitude <input type="number" id="longitude" step="any" name="longitude" ></div>
+    <div> Latitude <input th:required="required" type="number" id="latitude" step="any" name="latitude" >, Longitude <input th:required="required" type="number" id="longitude" step="any" name="longitude" ></div>
     <div>Problem Description: <input name="problemDescription"></div>
     <div>Images: <input name="image" type="file" multiple></div>
     <div id="button-container"><input id="submit" type="submit"></div>
