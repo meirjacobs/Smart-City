@@ -39,7 +39,7 @@
 <h1 id="header">Find Issue</h1>
 <div>Please fill out at least one field:</div>
 <form th:action="@{/find}" th:object="${data}" method="post">
-    <div> Issue ID #: <input type="number" min="0" value="0" step="1" name="id"></div>
+    <div> Issue ID #: <input type="number" min="1" step="1" name="id"></div>
     <div>Problem Type:
         <select name="problemType">
             <option>Any</option>
@@ -51,7 +51,7 @@
             <option>Water Damage</option>
             <option>Other</option>
         </select></div>
-    <div>Location: Within <input type="number" placeholder="1" name="distance"> km of Latitude <input id="latitude" type="number" step="any" name="latitude" value="40.77864253611675">, Longitude <input id="longitude" type="number" step="any" name="longitude" value="-73.9610921231848"></div>
+    <div>Location: Within <input type="number" name="distance"> km of Latitude <input id="latitude" type="number" step="any" name="latitude">, Longitude <input id="longitude" type="number" step="any" name="longitude"></div>
     <div> <button type="button" id = "current_location" return false>Use Current Location</button></div>
     <div id="map"></div>
     <div>Problem Description: <input name="problemDescription"></div>

@@ -42,7 +42,16 @@
         }
     </style>
 </head>
-<body onload="
+<body>
+<h1 id="header">Search Results</h1>
+<div th:if="${message}">
+    <h2 id ="message" th:text="${message}"/>
+</div>
+<div>
+    <a href="/"><button>Home</button></a>
+    <a href="/find"><button>Find Another Issue</button></a>
+</div>
+<script>
 const results = JSON.parse(document.getElementById('message').innerHTML)[0];
 var _table_ = document.createElement('table'),
     _tr_ = document.createElement('tr'),
@@ -95,14 +104,7 @@ function addAllColumnHeaders(arr, table) {
     table.appendChild(tr);
     return columnSet;
 }
-document.body.appendChild(buildHtmlTable(results));">
-<h1 id="header">Search Results</h1>
-<div th:if="${message}">
-    <h2 id ="message" th:text="${message}"/>
-</div>
-<div>
-    <a href="/"><button>Home</button></a>
-    <a href="/find"><button>Find Another Issue</button></a>
-</div>
+document.body.appendChild(buildHtmlTable(results));
+</script>
 </body>
 </html>
