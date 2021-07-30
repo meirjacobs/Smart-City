@@ -3,3 +3,6 @@ __pycache__/
 .pytest_cache/
 *.class
 *.iml
+.mvn/
+mvnw
+mvnw.cmd

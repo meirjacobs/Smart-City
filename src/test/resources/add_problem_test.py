@@ -1,5 +1,6 @@
 import json
 
+import mysql.connector
 import pytest
 import urllib3
 
@@ -96,7 +97,8 @@ def test_invalid_image_path():
     assert response.status == 400
     assert response.data == b"'image_path' is a required field which must be a list of strings"
 
-def test_no_image():
+def test_no_image(mycursor):
+    id_number = get_id_number()
     test_body = {
         "location": [31.77715670567932, 35.234471536758164],
         "problem_type": "Criminal Act",
@@ -110,8 +112,12 @@ def test_no_image():
     )
     assert response.status == 200
     assert response.data == b"Success, problem ticket uploaded. An employee will soon take care of the issue."
+    data = mycursor.execute("SELECT * FROM porblems WHERE id = {id_number}")
+    assert data == "[({id_number}, 'Cirminal Act', 'test - bank heist 1', ]"
+    clean_up(id_number=id_number)
 
 def test_one_image():
+    id_number = get_id_number()
     test_body = {
         "location": [31.772476274945593, 35.20411435593286],
         "problem_type": "Criminal Act",
@@ -125,8 +131,12 @@ def test_one_image():
     )
     assert response.status == 200
     assert response.data == b"Success, problem ticket uploaded. An employee will soon take care of the issue."
+    data = mycursor.execute("SELECT * FROM porblems WHERE id = {id_number}")
+    assert data == "[({id_number}, 'Cirminal Act', 'test - bank heist 1', ]"
+    clean_up(id_number=id_number)
 
 def test_multiple_images():
+    id_number = get_id_number()
     test_body = {
         "location": [31.788206782571194, 35.21833711571499],
         "problem_type": "Criminal Act",
@@ -143,3 +153,6 @@ def test_multiple_images():
     )
     assert response.status == 200
     assert response.data == b"Success, problem ticket uploaded. An employee will soon take care of the issue."
+    data = mycursor.execute("SELECT * FROM porblems WHERE id = {id_number}")
+    assert data == "[({id_number}, 'Cirminal Act', 'test - bank heist 1', ]"
+    clean_up(id_number=id_number)
