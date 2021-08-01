@@ -33,7 +33,7 @@
         tr:nth-child(odd) {
             background-color: white;
         }
-        #first_name, #current_status, #department {
+        #first_name, #last_name, #current_status, #department {
             color: blue
         }
         h2 {
@@ -103,11 +103,11 @@ document.body.appendChild(buildHtmlTable(results));">
 <div id ="employees"> Welcome,
     <span th:if="${first_name}">
     <text id ="first_name" th:text="${first_name}">
-    </text>.
+    </text>
     </span>
     <span th:if="${last_name}">
-    <text id ="last_name" th:text="${last_name}">
-    </text>
+    <text id="last_name" th:text="${last_name}">
+    </text>.
     </span>
     <span>Your current status is: </span>
     <span th:if="${current_status}">
