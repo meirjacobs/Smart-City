@@ -197,7 +197,6 @@ public class SmartCityController implements CommandLineRunner {
         // need id, first_name,last_name, department, current_assignment_id
         String username = body.getUsername();
         String password = body.getPassword();
-        String query1 = "Select id, first_name,last_name,department,current_assignment_id from employees where email = \"" +username+ "\"  and password = \"" +password+ "\"";
         String employee_idQuery = "Select id from employees where email = \"" +username+ "\"  and password = \"" +password+ "\"";
         String employee_id = jdbcTemplate.queryForObject(employee_idQuery,String.class);
         String first_nameQuery = "Select first_name from employees where email = \"" +username+ "\"  and password = \"" +password+ "\"";
@@ -209,23 +208,19 @@ public class SmartCityController implements CommandLineRunner {
         String departmentQuery = "Select department from employees where email = \"" +username+ "\"  and password = \"" +password+ "\"";
         String department = jdbcTemplate.queryForObject(departmentQuery,String.class);
         String current_assignment_id = "";
-        if(current_status == null){
+        if (current_status == null) {
             current_status = "Open";
-        }
-        else{
+        } else {
             current_assignment_id = current_status;
             current_status = "Busy";
         }
 
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         queryParams.put("problem_type", Arrays.asList(department));
-        if (current_status == "Busy")
-        {
+        if (current_status == "Busy") {
             queryParams.put("current_status", Arrays.asList("In Progress"));
             queryParams.put("id", Arrays.asList(current_assignment_id));
-
-        }
-        else {
+        } else {
             queryParams.put("current_status", Arrays.asList("Open"));
         }
         WebClient client = WebClient
@@ -249,7 +244,6 @@ public class SmartCityController implements CommandLineRunner {
         redirectAttributes.addFlashAttribute("current_status", current_status);
         redirectAttributes.addFlashAttribute("department", department);
         redirectAttributes.addFlashAttribute("employee_id", employee_id);
-
 
         return "redirect:/employee";
     }
@@ -298,7 +292,7 @@ public class SmartCityController implements CommandLineRunner {
     public String getEmployeePage(Model model) {
         return "employee";
     }
-    
+
     @GetMapping("/login")
     public String getLoginPage(Model model) {
         return "login";

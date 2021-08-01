@@ -7,13 +7,6 @@
         body {
             background-color: rgb(210, 255, 200);
             margin: 20px;
-
-        }
-        h1 {
-            font-family: sans-serif;
-            color: blue;
-            text-align: left;
-            font-size:25px;
         }
         div {
             font-family: monospace;
@@ -40,84 +33,90 @@
         tr:nth-child(odd) {
             background-color: white;
         }
+        #first_name, #current_status, #department {
+            color: blue
+        }
+        h2 {
+            font-family: sans-serif
+        }
     </style>
 </head>
 <body onload="
 const results = JSON.parse(document.getElementById('message').innerHTML)[0];
 
 var _table_ = document.createElement('table'),
-_tr_ = document.createElement('tr'),
-_th_ = document.createElement('th'),
-_td_ = document.createElement('td');
+    _tr_ = document.createElement('tr'),
+    _th_ = document.createElement('th'),
+    _td_ = document.createElement('td');
 
 // Builds the HTML Table out of myList json data from Ivy restful service.
 function buildHtmlTable(arr) {
-var table = _table_.cloneNode(false),
-columns = addAllColumnHeaders(arr, table);
-for (var i = 0, maxi = arr.length; i < maxi; ++i) {
-var tr = _tr_.cloneNode(false);
-for (var j = 0, maxj = columns.length; j < maxj; ++j) {
-var td = _td_.cloneNode(false);
-cellValue = arr[i][columns[j]];
-td.appendChild(document.createTextNode(arr[i][columns[j]] || ''));
-if (td.textContent.substring(0, 22) == ('https://www.google.com')) {
-td.innerHTML = '<a target=\'_blank\' href=\'' + td.textContent + '\'>Location</a>';
-} else if (td.textContent.substring(0, 5) == ('https')) {
-td.innerHTML = '<a target=\'_blank\' href=\'' + td.textContent + '\'>Image</a>';
-}
-tr.appendChild(td);
-}
-table.appendChild(tr);
-}
-return table;
+    var table = _table_.cloneNode(false),
+        columns = addAllColumnHeaders(arr, table);
+    for (var i = 0, maxi = arr.length; i < maxi; ++i) {
+        var tr = _tr_.cloneNode(false);
+        for (var j = 0, maxj = columns.length; j < maxj; ++j) {
+            var td = _td_.cloneNode(false);
+            cellValue = arr[i][columns[j]];
+            td.appendChild(document.createTextNode(arr[i][columns[j]] || ''));
+            if (td.textContent.substring(0, 22) == ('https://www.google.com')) {
+                td.innerHTML = '<a target=\'_blank\' href=\'' + td.textContent + '\'>Location</a>';
+            } else if (td.textContent.substring(0, 5) == ('https')) {
+                var links = td.textContent.split('|');
+                var linkText = '';
+                for (var k = 0; k < links.length - 1; k++) {
+                    linkText += '<a href=\'' + links[k] + '\'>Image' + (k + 1) + '</a> '
+                }
+                td.innerHTML = linkText;
+            }
+            tr.appendChild(td);
+        }
+        table.appendChild(tr);
+    }
+    return table;
 }
 
 // Adds a header row to the table and returns the set of columns.
 // Need to do union of keys from all records as some records may not contain
 // all records
 function addAllColumnHeaders(arr, table) {
-var columnSet = [],
-tr = _tr_.cloneNode(false);
-for (var i = 0, l = arr.length; i < l; i++) {
-for (var key in arr[i]) {
-if (arr[i].hasOwnProperty(key) && columnSet.indexOf(key) === -1) {
-columnSet.push(key);
-var th = _th_.cloneNode(false);
-th.appendChild(document.createTextNode(key));
-tr.appendChild(th);
+    var columnSet = [],
+        tr = _tr_.cloneNode(false);
+    for (var i = 0, l = arr.length; i < l; i++) {
+        for (var key in arr[i]) {
+            if (arr[i].hasOwnProperty(key) && columnSet.indexOf(key) === -1) {
+                columnSet.push(key);
+                var th = _th_.cloneNode(false);
+                th.appendChild(document.createTextNode(key));
+                tr.appendChild(th);
+            }
+        }
+    }
+    table.appendChild(tr);
+    return columnSet;
 }
-}
-}
-table.appendChild(tr);
-return columnSet;
-}
-document.body.appendChild(buildHtmlTable(results));
-">
+document.body.appendChild(buildHtmlTable(results));">
 <div th:if="${employee}">
     <h2 id ="employee" th:text="${employee}"/>
 </div>
 
-<div id ="employees"> Welcome
+<div id ="employees"> Welcome,
     <span th:if="${first_name}">
     <text id ="first_name" th:text="${first_name}">
-    </text>
+    </text>.
     </span>
     <span th:if="${last_name}">
     <text id ="last_name" th:text="${last_name}">
     </text>
     </span>
-    <span>your current status is: </span>
+    <span>Your current status is: </span>
     <span th:if="${current_status}">
-    <text id ="current_status" th:text="${current_status}">
-    </text>
+    <text id="current_status" th:text="${current_status}">
+    </text>.
     </span>
-
 </div>
-
-
-
 <br>
-<div>Here are a list of available issues in your department:
+<div>Your department is:
     <span th:if="${department}">
     <text id ="department" th:text="${department}">
     </text>
@@ -125,16 +124,16 @@ document.body.appendChild(buildHtmlTable(results));
 </div>
 <form th:action="@{/employee}" method="post">
     <div>
-        <label for="id" >Choose id of ticket</label>
-        <input type="number" name ="id" placeholder="id" id="id">
+        <label for="id">Choose ticket ID: </label>
+        <input type="number" name="id" placeholder="ID" id="id">
     </div>
     <div>
-        <label for="status" >Select "In Progress" when you will take up issue, select "Complete" when issue is completed</label>
+        <label for="status">Select "In Progress" to take up issue or "Complete" if the issue has been resolved.</label>
         <select name="status" id="status">
             <option value="In Progress">In Progress</option>
             <option value="Complete">Complete</option>
         </select>
-        <input type = "hidden" value = ""  name ="employee_id"  id="employee_id">
+        <input type="hidden" value =""  name="employee_id" id="employee_id">
     </div>
     <br>
     <input type="submit">
@@ -142,8 +141,7 @@ document.body.appendChild(buildHtmlTable(results));
     <text id ="id_text" th:text="${employee_id}">
     </text>
     <script>
-        document.getElementById("employee_id").value =document.getElementById("id_text").innerHTML;
-
+        document.getElementById("employee_id").value = document.getElementById("id_text").innerHTML;
     </script>
 </form>
 
@@ -152,7 +150,7 @@ document.body.appendChild(buildHtmlTable(results));
 <div th:if="${message}">
     <h2 id ="message" th:text="${message}"/>
 </div><br>
-<h2>table of available issues in employees department here:</h2>
-
+<h2>If you aren't currently working on an issue, see below for all the available issues in your department.<br>
+If you are working on an issue, see it below:</h2>
 </body>
 </html>
