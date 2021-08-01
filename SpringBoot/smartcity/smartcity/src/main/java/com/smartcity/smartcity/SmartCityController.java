@@ -30,6 +30,7 @@ public class SmartCityController implements CommandLineRunner {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
     @GetMapping("/")
     public String getHomePage() {
         return "HomePage";
@@ -47,6 +48,7 @@ public class SmartCityController implements CommandLineRunner {
 
         public void setPassword(String password) { this.password = password;}
     }
+
     public class GetData {
         private String id;
         private String problemType;
@@ -131,47 +133,27 @@ public class SmartCityController implements CommandLineRunner {
         }
     }
 
-
     @PostMapping("/employee")
     public void employeeUpdate(@RequestParam("id") int id, @RequestParam("status") String status,@RequestParam("employee_id") String employee_id_str) throws IOException {
-//        System.out.println("employee");
-//        System.out.println(id);
-        System.out.println(status);
-
         int employee_id = Integer.parseInt(employee_id_str);
-        System.out.println("test: "+employee_id);
         String bodyString = String.format("{\"id\":%d,\"current_status\":\""+status+"\",\"employee_id\":%d}",id,employee_id);
 
         WebClient client = WebClient.create(env.getProperty("apiURL"));
         WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.put();
         WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");
-        System.out.println(bodyString);
         WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue(bodyString);
         Mono<String> resp = headersSpec.exchangeToMono(response -> {
-
-//            System.out.println(response.headers());
-//            if (response.statusCode()
-//                    .equals(HttpStatus.OK)) {
-                return response.bodyToMono(String.class);
-//            } else if (response.statusCode()
-//                    .is4xxClientError()) {
-//                return Mono.just("Error response");
-//            } else {
-//                return response.createException()
-//                        .flatMap(Mono::error);
-//            }
+            return response.bodyToMono(String.class);
         });
         resp.subscribe(System.out::println);
-        System.out.println("employee page ");
-
     }
+
     @PostMapping("/report")
     public String handleFileUpload(@RequestParam("image") MultipartFile[] files, @RequestParam("problemType") String problemType,
                                    @RequestParam("latitude") String latitude, @RequestParam("longitude") String longitude,
                                    @RequestParam("problemDescription") String problemDescription) throws IOException {
 
         WebClient client = WebClient.create(env.getProperty("apiURL"));
-        System.out.println(env.getProperty("apiURL"));
         WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.post();
         WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");
 
@@ -184,8 +166,8 @@ public class SmartCityController implements CommandLineRunner {
                 fileString.append(",");
             }
         }
+
         String bodyString = "{\"problem_type\":\""+problemType+"\",\"location\":["+latitude+","+longitude+"],\"problem_description\":\""+problemDescription+"\",\"image_path\":["+fileString+"]}";
-        System.out.println(bodyString);
 
         WebClient.RequestHeadersSpec<?> headersSpec = bodySpec.bodyValue(bodyString);
         Mono<String> resp = headersSpec.exchangeToMono(response -> {
@@ -204,18 +186,15 @@ public class SmartCityController implements CommandLineRunner {
 
         return "ThankYouPage";
     }
+
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("running");
+        //System.out.println("running");
     }
-
 
     @PostMapping("/login")
     public String submitLogin(@ModelAttribute("data") GetLogin body, RedirectAttributes redirectAttributes) {
-
-// need id, first_name,last_name, department, current_assignment_id
-        System.out.println(body.getUsername());
-        System.out.println(body.getPassword());
+        // need id, first_name,last_name, department, current_assignment_id
         String username = body.getUsername();
         String password = body.getPassword();
         String query1 = "Select id, first_name,last_name,department,current_assignment_id from employees where email = \"" +username+ "\"  and password = \"" +password+ "\"";
@@ -237,10 +216,7 @@ public class SmartCityController implements CommandLineRunner {
             current_assignment_id = current_status;
             current_status = "Busy";
         }
-//        Map<String,Object> employeeResult = jdbcTemplate.queryForMap(query1);
-//        System.out.println(employeeResult.values());
-//
-//        String department = (String) employeeResult.get("department");
+
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         queryParams.put("problem_type", Arrays.asList(department));
         if (current_status == "Busy")
@@ -268,7 +244,6 @@ public class SmartCityController implements CommandLineRunner {
                 .block();
 
         redirectAttributes.addFlashAttribute("message", results);
-//        redirectAttributes.addFlashAttribute("employee", employeeResult);
         redirectAttributes.addFlashAttribute("first_name", first_name);
         redirectAttributes.addFlashAttribute("last_name", last_name);
         redirectAttributes.addFlashAttribute("current_status", current_status);
@@ -280,14 +255,8 @@ public class SmartCityController implements CommandLineRunner {
     }
     @PostMapping("/find")
     public String submitFind(@ModelAttribute("data") GetData body, RedirectAttributes redirectAttributes) {
-        System.out.println("find");
-        System.out.println(body);
-
-
-        System.out.println(Arrays.asList(body));
-
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        if (!body.getId().equals("0")) {
+        if (!body.getId().equals("")) {
             queryParams.put("id", Arrays.asList(body.getId()));
         }
         if (!body.getProblemType().equals("Any")) {
@@ -306,13 +275,10 @@ public class SmartCityController implements CommandLineRunner {
         if (!body.getStartTime().equals("") && !body.getEndTime().equals("")) {
             queryParams.put("time_found", Arrays.asList(body.getStartTime() + "," + body.getEndTime()));
         }
-        System.out.println(queryParams);
         WebClient client = WebClient
                 .builder()
                 .baseUrl(env.getProperty("apiURL"))
                 .build();
-//        List<String> types = Arrays.asList("id", "problem_type", "problem_description", "time_found", "current_status",
-//                "location", "image_path", "distance");
         List<String> results = client
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -323,17 +289,16 @@ public class SmartCityController implements CommandLineRunner {
                 .bodyToFlux(String.class)
                 .collectList()
                 .block();
-        System.out.println(results.get(0));
-        System.out.println(results);
         redirectAttributes.addFlashAttribute("message", results);
-        //System.out.println(results);
 
         return "redirect:/results";
     }
+
     @GetMapping("/employee")
     public String getEmployeePage(Model model) {
         return "employee";
     }
+    
     @GetMapping("/login")
     public String getLoginPage(Model model) {
         return "login";
