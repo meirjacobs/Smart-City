@@ -2,6 +2,7 @@ package com.smartcity.smartcity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import reactor.core.publisher.Mono;
-
+import javax.sql.DataSource;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
