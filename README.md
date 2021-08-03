@@ -23,7 +23,7 @@ Follow the instructions in the 'Parameters' section.
 
 4. Open a command line and run\
 `docker run -p 8080:8080 -e API_URL=api_gateway_link -e SPRING_DATASOURCE_URL=jdbc:mysql://database_link:3306/Smart_City -e SPRING_DATASOURCE_PASSWORD="password" ecrystal/smart_city_repository:latest`, but replace `api_gateway_link` with the Invoke URL to your API Gateway, `database_link` with your database hostname, and `password` with your database password (see below for assistance).
-    * To find the URL to your API Gateway, visit the [API Gateway console](https://console.aws.amazon.com/apigateway/main/apis) and click SmartCityAPIGateway. On the left of the screen, click Stages. Click deployedStage. The URL next to Invoke URL is what you need.
+    * To find the URL to your API Gateway, visit the [API Gateway Console](https://console.aws.amazon.com/apigateway/main/apis) and click SmartCityAPIGateway. On the left of the screen, click Stages. Click deployedStage. The URL next to Invoke URL is what you need.
     * To find the hostname and password to your database, visit the [Secrets Manager Console](https://console.aws.amazon.com/secretsmanager/home), select MySQL-Credentials, scroll down a little and click "Retrieve secret value." You should see key-value pairs for "host" and "password."
 
 5. Open your browser of choice, visit [localhost:8080](https://localhost:8080), and enjoy.

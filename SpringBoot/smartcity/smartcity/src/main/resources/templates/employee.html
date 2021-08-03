@@ -124,11 +124,11 @@ document.body.appendChild(buildHtmlTable(results));">
 </div>
 <form th:action="@{/employee}" method="post">
     <div>
-        <label for="id">Choose ticket ID: </label>
+        <label for="id">Choose Ticket ID: </label>
         <input type="number" name="id" placeholder="ID" id="id">
     </div>
     <div>
-        <label for="status">Select "In Progress" to take up issue or "Complete" if the issue has been resolved.</label>
+        <label for="status">Select "In Progress" to take up issue or "Complete" if the issue has been resolved:</label>
         <select name="status" id="status">
             <option value="In Progress">In Progress</option>
             <option value="Complete">Complete</option>
