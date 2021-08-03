@@ -182,6 +182,7 @@ Resources:
         Bucket: !Ref ResourcesBucket
         Key: lambdas.zip
       Runtime: python3.8
+      Timeout: 15
       Handler: ReadProblemLambda.lambda_handler
       Role: !GetAtt SmartCityLambdaRole.Arn
       Layers:
@@ -332,7 +333,7 @@ Resources:
               "type": "metric",
               "properties": {
                 "metrics": [
-                  [ "AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", "${!'{{resolve:secretsmanager:${MySQLSecret}:SecretString:dbInstanceIdentifier}}", { "label": "CPU Utilization" } ]
+                  [ "AWS/RDS", "CPUUtilization", "DBInstanceIdentifier", "{{resolve:secretsmanager:${MySQLSecret}:SecretString:dbInstanceIdentifier}}", { "label": "CPU Utilization" } ]
                 ],
                 "view": "timeSeries",
                 "stacked": false,
@@ -364,25 +365,27 @@ Resources:
                 "region": "${AWS::Region}",
                 "title": "Lambda Errors",
                 "period": 300,
-                "stat": "Average"
+                "stat": "Sum"
               }
             },
             {
-              "type": "metric",
               "height": 6,
               "width": 9,
               "x": 15,
               "y": 0,
+              "type": "metric",
               "properties": {
+                "metrics": [
+                  [ "AWS/ApiGateway", "Count", "ApiName", "SmartCityAPIGateway" ],
+                  [ ".", "4XXError", ".", "." ],
+                  [ ".", "5XXError", ".", "." ]
+                ],
                 "view": "timeSeries",
                 "stacked": false,
-                "metrics": [
-                  [ "AWS/ApiGateway", "5XXError", "ApiName", "SmartCityAPIGateway" ],
-                  [ ".", "Count", ".", "." ],
-                  [ ".", "4XXError", ".", "." ]
-                ],
                 "region": "${AWS::Region}",
-                "title": "HTTP Responses"
+                "title": "HTTP Responses",
+                "period": 300,
+                "stat": "Sum"
               }
             }
           ]
