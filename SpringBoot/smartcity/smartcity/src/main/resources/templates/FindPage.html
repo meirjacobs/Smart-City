@@ -2,20 +2,27 @@
 <html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBEMFMGUS0w_pLlpBBUVwmNTP2FyECsmkE"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
     <title>Find Issue</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <style>
         body {
             background-color: rgb(210, 255, 200);
+            font-family: 'Open Sans', sans-serif;
+
         }
         #header {
-            font-family: sans-serif;
-            color: blue;
+            color: rgb(0, 0, 0);
             text-align: center;
         }
+        h1{
+            padding-bottom:15px;
+            border-bottom: 1px solid black;
+        }
         div, input, select {
-            font-family: monospace;
-            margin-top: 5px;
+            margin-top: 10px;
         }
         #submit {
             padding: 20px;
@@ -30,42 +37,128 @@
         #button-container {
             text-align: center;
         }
+        #submit {
+            padding: 20px;
+            margin: 10px;
+            background-color: rgb(255, 255, 210);
+            border-radius: 10px;
+        }
+        #submit:hover {
+            cursor: pointer;
+            background-color: rgb(230, 230, 190);
+        }
+      
+        #submit {
+             text-align: center;
+            -webkit-text-stroke-width: 0px;
+            -moz-appearance: none;
+            -webkit-appearance: none;
+            -ms-appearance: none;
+            appearance: none;
+            -moz-transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            -webkit-transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            -ms-transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+            background-color: #2da0da;
+            border-radius: 6px;
+            border: 0;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: 400;
+            height: 3em;
+            line-height: 3em;
+            padding: 0 2em;
+            text-align: center;
+            text-decoration: none;
+            white-space: nowrap;
+            font-family: 'Open Sans', sans-serif;
+            color:white;
+
+        }
+        #submit:hover {
+            background-color: #39ade7ce;
+            
+        }
+
+        #submit:active {
+            background-color: #39ade775;
+        }
+        input[type=button]:active,input[type=submit]:active  {
+            -moz-transform: scale(0.95);
+            -webkit-transform: scale(0.95);
+            -o-transform: scale(0.95);
+            -ms-transform: scale(0.95);
+            transform: scale(0.95);
+        }
         #map {
-            width:400px; height: 200px;
+            height: 220px;
+             margin-left: 70px;
+             margin-right: 70px;
+         }
+        .center {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+            min-height: 100%;
+        }
+        
+        #container {
+            -webkit-border-radius: 10px 10px 10px 10px;
+            border-radius: 10px 10px 10px 10px;
+            background: #fff;
+            padding: 30px;
+            width: 90%;
+            max-width: 680px;
+            position: relative;
+            padding: 0px;
+            -webkit-box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
+            box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        #text1{
+            font-size: 1.3em;
         }
     </style>
 </head>
 <body>
-<h1 id="header">Find Issue</h1>
-<div>Please fill out at least one field:</div>
-<form th:action="@{/find}" th:object="${data}" method="post">
-    <div> Issue ID #: <input type="number" min="1" step="1" name="id"></div>
-    <div>Problem Type:
-        <select name="problemType">
-            <option>Any</option>
-            <option>Road Hazard</option>
-            <option>Criminal Act</option>
-            <option>Environmental Hazard</option>
-            <option>Vehicle Damage</option>
-            <option>Fire</option>
-            <option>Water Damage</option>
-            <option>Other</option>
-        </select></div>
-    <div>Location: Within <input type="number" name="distance"> km of Latitude <input id="latitude" type="number" step="any" name="latitude">, Longitude <input id="longitude" type="number" step="any" name="longitude"></div>
-    <div> <button type="button" id = "current_location" return false>Use Current Location</button></div>
-    <div id="map"></div>
-    <div>Problem Description: <input name="problemDescription"></div>
-    <!--<div>Image: <input name="image" type="file"></div>-->
-    <div>Current Status:
-        <select name="status">
-            <option value="Any">Any</option>
-            <option value="Open">Open</option>
-            <option value="In Progress">In Progress</option>
-        </select>
+    <div class="center">
+        <div id="container">
+            <h1 id="header">Find Issue</h1>
+            <div id= "text1">Enter the following informaton to find an issue:</div>
+            <div>(Please fill out at least one field)</div>
+            <form th:action="@{/find}" th:object="${data}" method="post">
+                <div> Issue ID #: <input type="number" min="1" step="1" name="id"></div>
+                <div>Problem Type:
+                    <select name="problemType">
+                        <option>Any</option>
+                        <option>Road Hazard</option>
+                        <option>Criminal Act</option>
+                        <option>Environmental Hazard</option>
+                        <option>Vehicle Damage</option>
+                        <option>Fire</option>
+                        <option>Water Damage</option>
+                        <option>Other</option>
+                    </select></div>
+                <div>Location: Within <input type="number" name="distance"> km of</div>
+                <div>Latitude <input id="latitude" type="number" step="any" name="latitude"> Longitude <input id="longitude" type="number" step="any" name="longitude"></div>
+                <div> <button type="button" id = "current_location" return false>Use Current Location</button></div>
+                <div id="map"></div>
+                <div>Problem Description: <input name="problemDescription"></div>
+                <!--<div>Image: <input name="image" type="file"></div>-->
+                <div>Current Status:
+                    <select name="status">
+                        <option value="Any">Any</option>
+                        <option value="Open">Open</option>
+                        <option value="In Progress">In Progress</option>
+                    </select>
+                </div>
+                <div>Time Reported: Between <input type="datetime-local" name="startTime"> and <input type="datetime-local" name="endTime"></div>
+                <div id="button-container"><input id="submit" type="submit"></div>
+            </form>
+        </div>
     </div>
-    <div>Time Reported: Between <input type="datetime-local" name="startTime"> and <input type="datetime-local" name="endTime"></div>
-    <div id="button-container"><input id="submit" type="submit"></div>
-</form>
 <script >
 //Set up some of our variables.
 var map; //Will contain map object.
