@@ -2,7 +2,6 @@ package com.smartcity.smartcity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,10 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import reactor.core.publisher.Mono;
-import javax.sql.DataSource;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
 
 
 @org.springframework.stereotype.Controller
@@ -138,7 +139,6 @@ public class SmartCityController implements CommandLineRunner {
     public void employeeUpdate(@RequestParam("id") int id, @RequestParam("status") String status,@RequestParam("employee_id") String employee_id_str) throws IOException {
         int employee_id = Integer.parseInt(employee_id_str);
         String bodyString = String.format("{\"id\":%d,\"current_status\":\""+status+"\",\"employee_id\":%d}",id,employee_id);
-
         WebClient client = WebClient.create(env.getProperty("apiURL"));
         WebClient.UriSpec<WebClient.RequestBodySpec> uriSpec = client.put();
         WebClient.RequestBodySpec bodySpec = uriSpec.uri("/");
