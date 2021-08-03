@@ -16,7 +16,22 @@
         /* Reset */
         
         /* Based on meyerweb.com/eric/tools/css/reset (v2.0 | 20110126 | License: public domain) */
-       
+        body{
+            margin: 0px;
+            padding: 0px;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+            background-color: rgb(210, 255, 200);
+        
+            background: url('images/city1.jpg') no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+    
+        }
      
              #banner{
                  -webkit-text-stroke-width: .5px;
@@ -148,28 +163,13 @@
                     
                         }
                        
-                        body{
-                            margin: 0px;
-                            padding: 0px;
-                            border: 0;
-                            font-size: 100%;
-                            font: inherit;
-                            vertical-align: baseline;
-                            background-color: rgb(210, 255, 200);
-                        
-                            background: url('city1.jpg') no-repeat center center fixed;
-                            -webkit-background-size: cover;
-                            -moz-background-size: cover;
-                            -o-background-size: cover;
-                            background-size: cover;
-                    
-                        }
+                   
        
     </style>
 </head>
 <body >
     <!-- <div> -->
-<!-- <img src="city1.jpg" id ="pic"> -->
+ <!-- <img src="city1.jpg" id ="pic"> -->
 <!-- </div> -->
 <!-- 
 <h1 id="header">Smart City Reporting System</h1>
@@ -185,9 +185,9 @@
     <!-- <p>Another fine responsive site template freebie by HTML5 UP.</p> -->
     <ul class="actions special">
         
-        <li><a href="#" class="button">Report Issue</a></li>
-        <li><a href="#" class="button">Find Issue</a></li>
-        <li><a href="#" class="button">Employee Login</a></li>
+        <li><a href="/report" class="button">Report Issue</a></li>
+        <li><a href="/find" class="button">Find Issue</a></li>
+        <li><a href="/login" class="button">Employee Login</a></li>
 
     </ul>
 </section>
