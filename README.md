@@ -1,6 +1,9 @@
 # Smart City
 
-Code repository for the Smart City team for Yeshiva University's Industrial Software Development Summer Project
+Code repository for the Smart City team for Yeshiva University's Industrial Software Development Summer Project. Created in Summer 2021 by [Nir Solooki](https://www.linkedin.com/in/nir-solooki-018702204/), [Ephraim Crystal](https://www.linkedin.com/in/ephraim-crystal-429a8020a/), [Max Friedman](https://www.linkedin.com/in/max-friedman-98a77a205/), and [Meir Jacobs](https://www.linkedin.com/in/jordan-meir-jacobs/), under the guidance of [David Rosenstark](https://www.linkedin.com/in/david-rosenstark-3b070b8/).
+
+## About
+We built a deployable Smart City Reporting System. Using AWS, we created a system that allows users to report and query issues in a city. We then used Spring Boot to create a web application built on our AWS system that allows both regular users and city employees to easily add, update, and query information. Finally, we used Docker to create an executable file that anyone can pull and run.
 
 ## Steps for Deployment
 
