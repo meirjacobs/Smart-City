@@ -27,7 +27,7 @@ def lambda_handler(event, context):
         return invalid_id
 
     # store employee's data
-    mycursor.execute(f'SELECT * FROM employees WHERE id = {event_body["id"]}')
+    mycursor.execute(f'SELECT first_name, last_name FROM employees WHERE id = {event_body["id"]}')
     data = mycursor.fetchall()[0]
 
     # delete employee from employees table

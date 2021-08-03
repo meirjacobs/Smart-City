@@ -36,10 +36,10 @@ def lambda_handler(event, context):
     }
 
 def validate_input():
-    if len(event_body) != 4:
+    if len(event_body) != 5:
         return {
             'statusCode': 400,
-            'body': f'Four items requires. Received {len(event_body)}.\nInput: {json.dumps(event_body)}'
+            'body': f'Five items requires. Received {len(event_body)}.\nInput: {json.dumps(event_body)}'
         }
     
     if "first_name" not in event_body or not isinstance(event_body["first_name"], str):
@@ -72,6 +72,13 @@ def validate_input():
             'statusCode': 400,
             'body': "The email you entered was not valid. Please try again."
         }
+    
+    if "password" not in event_body or not isinstance(event_body["password"], str):
+        return {
+            'statusCode': 400,
+            'body': "'password' is a required field and must be of type string"
+        }
+        
    
     department_list = ['Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', 'Other']
     if "department" not in event_body or event_body["department"] not in department_list:
@@ -104,7 +111,7 @@ def validate_email():
         }
 
 def insert_employee():
-    insert = "INSERT INTO employees (first_name, last_name, email, department) VALUES (%s, %s, %s, %s)"
-    val = (event_body["first_name"], event_body["last_name"], event_body["email"], event_body["department"])
+    insert = "INSERT INTO employees (first_name, last_name, email, password, department) VALUES (%s, %s, %s, %s, %s)"
+    val = (event_body["first_name"], event_body["last_name"], event_body["email"], event_body["password"], event_body["department"])
     mycursor.execute(insert, val)
     mydb.commit()
