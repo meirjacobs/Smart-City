@@ -1,176 +1,168 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.w3.org/1999/xhtml">
+<html>
 <head>
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBEMFMGUS0w_pLlpBBUVwmNTP2FyECsmkE"></script>
-    <title>Report Issue</title>
+    <title>Smart City Reporting System</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <style>
-        body {
+        @import url("fontawesome-all.min.css");
+        @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,300italic,400italic");
+
+        /*
+            Alpha by HTML5 UP
+            html5up.net | @ajlkn
+            Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+        */
+
+        /* Reset */
+
+        /* Based on meyerweb.com/eric/tools/css/reset (v2.0 | 20110126 | License: public domain) */
+
+        body{
+            margin: 0px;
+            padding: 0px;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
             background-color: rgb(210, 255, 200);
+
+            background: url('https://images.pexels.com/photos/2246476/pexels-photo-2246476.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260') no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
         }
-        #header {
-            font-family: sans-serif;
-            color: blue;
+
+        #banner{
+            -webkit-text-stroke-width: 0.5px;
+            -webkit-text-stroke-color: rgb(0, 0, 0);
+            margin: 200	px;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+        }
+
+        section {
+            display: block;
+        }
+
+        /* Banner */
+
+        #banner {
+            background-attachment: scroll, fixed;
+            background-position: top left, center center;
+            background-repeat: repeat, no-repeat;
+            background-size: auto, cover;
+            color: #fff;
+            padding: 12em 0 20em 0;
             text-align: center;
-        }
-        div, input, select {
-            font-family: monospace;
-            margin-top: 5px;
-        }
-        #submit {
             padding: 20px;
-            margin: 10px;
-            background-color: rgb(255, 255, 210);
-            border-radius: 10px;
         }
-        #submit:hover {
+
+        #banner p {
+            font-size: 1.25em;
+            margin-bottom: 1.75em;
+        }
+
+        #banner .button {
+            background-color: #39ace7;
+            box-shadow: inset 0 0 0 2px rgb(210, 255, 200);;
+            color: rgb(255, 255, 255);
+            min-width: 12em;
+            margin: 3px;
+        }
+
+        #banner .button:hover {
+            background-color: #39ade7ce;
+        }
+
+        #banner .button:active {
+            background-color: #39ade775;
+        }
+
+        #container{
+            background-color: rgb(255, 255, 255);
+            width: 300px;
+            justify-content: center;
+            margin-left: 200px;
+            border: 9px black;
+            -webkit-border-radius: 5px 5px 5px 5px;
+            border-radius: 5px 5px 5px 5px;
+        }
+
+        li {
+            list-style: none
+        }
+
+        /* Button */
+
+        .button {
+            -webkit-text-stroke-width: 0px;
+            -moz-appearance: none;
+            -webkit-appearance: none;
+            -ms-appearance: none;
+            appearance: none;
+            -moz-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            -webkit-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            -ms-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            background-color: #666;
+            border-radius: 6px;
+            border: 0;
             cursor: pointer;
-            background-color: rgb(230, 230, 190);
-        }
-        #button-container {
+            display: inline-block;
+            font-weight: 400;
+            height: 3em;
+            line-height: 3em;
+            padding: 0 2em;
             text-align: center;
+            text-decoration: none;
+            white-space: nowrap;
         }
-        #map {
-            width:400px; height: 200px;
+
+        /* Banner */
+
+        #banner h2 span {
+            font-size: 2.25em;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        #banner p {
+            font-size: 1.25em;
+        }
+
+        #banner {
+            padding: 5em 3em 4em 3em;
+        }
+
+        html {
+            height: 100%
+        }
+
+        section {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
         }
     </style>
-
 </head>
-<body>
+<body >
+<section id="banner">
+    <h2><span>Smart City Reporting System</span></h2>
+    <ul class="actions special">
 
-<h1 id="header">Report Issue</h1>
-<div>Thank you for taking the time to report an issue. Problem Type and Location are required:</div>
-<form th:action="@{/report}" enctype="multipart/form-data" method="post">
-    <div>Problem Type:
-        <select name="problemType">
-            <option>Road Hazard</option>
-            <option>Criminal Act</option>
-            <option>Environmental Hazard</option>
-            <option>Vehicle Damage</option>
-            <option>Fire</option>
-            <option>Water Damage</option>
-            <option>Other</option>
-        </select></div>
-    <div>Location:
-        <!-- <input type="button" onclick="getLocation()" return false> -->
-        <button type="button" id = "current_location" return false>Use Current Location</button>
-    </div>
-    <div id="map"></div>
-    <div> Latitude <input th:required="required" type="number" id="latitude" step="any" name="latitude" >, Longitude <input th:required="required" type="number" id="longitude" step="any" name="longitude" ></div>
-    <div>Problem Description: <input name="problemDescription"></div>
-    <div>Images: <input name="image" type="file" multiple></div>
-    <div id="button-container"><input id="submit" type="submit"></div>
-</form>
-<script >//Set up some of our variables.
-var map; //Will contain map object.
-var marker = false; ////Has the user plotted their location marker?
+        <li><a href="/report" class="button">Report Issue</a></li>
+        <li><a href="/find" class="button">Find Issue</a></li>
+        <li><a href="/login" class="button">Employee Login</a></li>
 
-//Function called to initialize / create the map.
-//This is called when the page has loaded.
-var x = document.getElementById("latitude");
-var y = document.getElementById("longitude");
-
-function initMap() {
-
-    //The center location of our map.
-    var centerOfMap = new google.maps.LatLng(40.77864253611675, -73.9610921231848);
-
-    //Map options.
-    var options = {
-      center: centerOfMap, //Set center.
-      zoom: 3 //The zoom value.
-    };
-
-    //Create the map object.
-    map = new google.maps.Map(document.getElementById('map'), options);
-
-    //Listen for any clicks on the map.
-
-    document.getElementById("current_location").addEventListener("click", function() {
-        console.log("current location")
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(getPosition);
-
-          } else {
-            x.innerHTML = "Geolocation is not supported by this browser.";
-          }
-
-    });
-
-
-function getPosition(position) {
-    //document.getElementById("map").click();
-    console.log("second?")
-
-    //Map options.
-
-    x.value = position.coords.latitude;
-    y.value = position.coords.longitude;
-    console.log(x.value);
-    var position = new google.maps.LatLng(x.value,y.value);
-    //var currentLocation = {lat: x, lng: y};
-    if(marker === false){
-        console.log("marker")
-        //Create the marker.
-        marker = new google.maps.Marker({
-            position: position,
-             map:map,
-            draggable: true //make it draggable
-        });
-        map.setCenter(position);
-        map.setZoom(3);
-
-    } else{
-        marker.setPosition(position)
-        map.setCenter(position);
-        map.setZoom(3);
-        //Marker has already been added, so just change its location.
-
-}
-    //Get the marker's location.
-    }
-
-    google.maps.event.addListener(map, 'click', function(event) {
-        console.log("first?")
-        console.log(event);
-        //Get the location that the user clicked.
-        var clickedLocation = event.latLng;
-        console.log(event.latLng)
-        //If the marker hasn't been added.
-        if(marker === false){
-            //Create the marker.
-            marker = new google.maps.Marker({
-                position: clickedLocation,
-                map: map,
-                draggable: true //make it draggable
-            });
-            //Listen for drag events!
-            google.maps.event.addListener(marker, 'dragend', function(event){
-                markerLocation();
-            });
-        } else{
-            //Marker has already been added, so just change its location.
-            marker.setPosition(clickedLocation);
-    }
-        //Get the marker's location.
-       markerLocation();
-   });
-}
-
-//This function will get the marker's current location and then add the latitude/long
-//values to our textfields so that we can save the location.
-function markerLocation(){
-    //Get location.
-    var currentLocation = marker.getPosition();
-    //Add latitude and longitude values to a field that we can save.
-    document.getElementById('latitude').value = currentLocation.lat(); //latitude
-    document.getElementById('longitude').value = currentLocation.lng(); //longitude
-}
-
-
-//Load the map when the page has finished loading.
-google.maps.event.addDomListener(window, 'load', initMap());
-</script>
-
+    </ul>
+</section>
 </body>
 </html>
