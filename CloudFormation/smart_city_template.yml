@@ -159,6 +159,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-AddProblem
+      Description: "Adds problem to database, uploads submitted images, and emails avaliable employees"
       Environment:
         Variables:
           BUCKET_NAME: !Ref SmartCityS3Bucket
@@ -175,6 +176,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-ReadProblem
+      Description: "Queries data in a wide variety of ways"
       Environment:
         Variables:
           BUCKET_NAME: !Ref SmartCityS3Bucket
@@ -191,6 +193,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-AddEmployee
+      Description: "Adds employee to database"
       CodeUri:
         Bucket: !Ref ResourcesBucket
         Key: lambdas.zip
@@ -203,6 +206,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-DeleteEmployee
+      Description: "Deletes employee from database based on given ID"
       CodeUri:
         Bucket: !Ref ResourcesBucket
         Key: lambdas.zip
@@ -215,6 +219,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-UpdateProblem
+      Description: "Update the Current Status of a specific problem"
       CodeUri:
         Bucket: !Ref ResourcesBucket
         Key: lambdas.zip
@@ -227,6 +232,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-LogProblem
+      Description: "Invoked by Add/Update-Problem lambdas to log the changes of each problem"
       CodeUri:
         Bucket: !Ref ResourcesBucket
         Key: lambdas.zip
@@ -239,6 +245,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-DeleteProblem
+      Description: "Automatically deletes a problem from database when set to 'Complete'"
       CodeUri:
         Bucket: !Ref ResourcesBucket
         Key: lambdas.zip
@@ -251,6 +258,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: CloudFormation-Emailer
+      Description: "Sends emails with pictures to all avaliable employees in the specified department"
       Environment:
         Variables:
           BUCKET_NAME: !Ref SmartCityS3Bucket
