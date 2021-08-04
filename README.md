@@ -10,7 +10,7 @@ For more details, please take a look at our [slideshow](https://docs.google.com/
 
 Prerequisites: 
 - AWS Account with appropriate permissions and sufficient credits
-- Gmail account
+- Gmail account with [less secure app access](https://myaccount.google.com/lesssecureapps) enabled
 - Docker desktop app installed
 
 Steps:
