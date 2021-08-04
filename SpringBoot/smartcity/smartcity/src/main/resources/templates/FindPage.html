@@ -142,7 +142,7 @@
                         <option>Other</option>
                     </select></div>
                 <div>Location: Within <input type="number" name="distance"> km of</div>
-                <div>Latitude <input id="latitude" type="number" step="any" name="latitude"> Longitude <input id="longitude" type="number" step="any" name="longitude"></div>
+                <div>Latitude <input id="latitude" type="number" step="any" min="-180" max="180" name="latitude"> Longitude <input id="longitude" type="number" step="any" min="-180" max="180" name="longitude"></div>
                 <div> <button type="button" id = "current_location" return false>Use Current Location</button></div>
                 <div id="map"></div>
                 <div>Problem Description: <input name="problemDescription"></div>

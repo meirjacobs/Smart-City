@@ -1,168 +1,173 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-<head>
+  <head>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet" />
     <title>Smart City Reporting System</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <style>
-        @import url("fontawesome-all.min.css");
-        @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,300italic,400italic");
-        
-        /*
+      @import url("fontawesome-all.min.css");
+      @import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,300italic,400italic");
+
+      /*
             Alpha by HTML5 UP
             html5up.net | @ajlkn
             Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
         */
-        
-        /* Reset */
-        
-        /* Based on meyerweb.com/eric/tools/css/reset (v2.0 | 20110126 | License: public domain) */
 
-        body{
-            margin: 0px;
-            padding: 0px;
-            border: 0;
-            font-size: 100%;
-            font: inherit;
-            vertical-align: baseline;
-            background-color: rgb(210, 255, 200);
-        
-            background: url('https://images.pexels.com/photos/2246476/pexels-photo-2246476.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260') no-repeat center center fixed;
-            -webkit-background-size: cover;
-            -moz-background-size: cover;
-            -o-background-size: cover;
-            background-size: cover;
-        }
+      /* Reset */
 
-        #banner{
-            -webkit-text-stroke-width: 0.5px;
-            -webkit-text-stroke-color: rgb(0, 0, 0);
-            margin: 200	px;
-            padding: 0;
-            border: 0;
-            font-size: 100%;
-            font: inherit;
-            vertical-align: baseline;
-        }
+      /* Based on meyerweb.com/eric/tools/css/reset (v2.0 | 20110126 | License: public domain) */
 
-        section {
-            display: block;
-        }
+      body {
+        margin: 0px;
+        padding: 0px;
+        border: 0;
+        font-size: 100%;
+        font: inherit;
+        vertical-align: baseline;
+        background-color: rgb(210, 255, 200);
 
-        /* Banner */
+        background: url("https://images.pexels.com/photos/2246476/pexels-photo-2246476.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260")
+          no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+      }
 
-        #banner {
-            background-attachment: scroll, fixed;
-            background-position: top left, center center;
-            background-repeat: repeat, no-repeat;
-            background-size: auto, cover;
-            color: #fff;
-            padding: 12em 0 20em 0;
-            text-align: center;
-            padding: 20px;
-        }
+      #banner {
+        -webkit-text-stroke-width: 0.5px;
+        -webkit-text-stroke-color: rgb(0, 0, 0);
+        margin: 200 px;
+        padding: 0;
+        border: 0;
+        font-size: 100%;
+        font: inherit;
+        vertical-align: baseline;
+      }
 
-        #banner p {
-            font-size: 1.25em;
-            margin-bottom: 1.75em;
-        }
+      section {
+        display: block;
+      }
 
-        #banner .button {
-            background-color: #39ace7;
-            box-shadow: inset 0 0 0 2px rgb(210, 255, 200);;
-            color: rgb(255, 255, 255);
-            min-width: 12em;
-            margin: 3px;
-        }
+      /* Banner */
 
-        #banner .button:hover {
-            background-color: #39ade7ce;
-        }
+      #banner {
+        background-attachment: scroll, fixed;
+        background-position: top left, center center;
+        background-repeat: repeat, no-repeat;
+        background-size: auto, cover;
+        color: #fff;
+        padding: 12em 0 20em 0;
+        text-align: center;
+        padding: 20px;
+      }
 
-        #banner .button:active {
-            background-color: #39ade775;
-        }
+      #banner p {
+        font-size: 1.25em;
+        margin-bottom: 1.75em;
+      }
 
-        #container{
-            background-color: rgb(255, 255, 255);
-            width: 300px;
-            justify-content: center;
-            margin-left: 200px;
-            border: 9px black;
-            -webkit-border-radius: 5px 5px 5px 5px;
-            border-radius: 5px 5px 5px 5px;
-        }
+      #banner .button {
+        background-color: #39ace7;
+        box-shadow: inset 0 0 0 2px rgb(210, 255, 200);
+        color: rgb(255, 255, 255);
+        min-width: 12em;
+        margin: 3px;
+        font-family: "Open Sans", sans-serif;
+      }
 
-        li {
-            list-style: none
-        }
+      #banner .button:hover {
+        background-color: #39ade7ce;
+      }
 
-        /* Button */
+      #banner .button:active {
+        background-color: #39ade775;
+      }
 
-        .button {
-            -webkit-text-stroke-width: 0px;
-            -moz-appearance: none;
-            -webkit-appearance: none;
-            -ms-appearance: none;
-            appearance: none;
-            -moz-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-            -webkit-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-            -ms-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-            background-color: #666;
-            border-radius: 6px;
-            border: 0;
-            cursor: pointer;
-            display: inline-block;
-            font-weight: 400;
-            height: 3em;
-            line-height: 3em;
-            padding: 0 2em;
-            text-align: center;
-            text-decoration: none;
-            white-space: nowrap;
-        }
+      #container {
+        background-color: rgb(255, 255, 255);
+        width: 300px;
+        justify-content: center;
+        margin-left: 200px;
+        border: 9px black;
+        -webkit-border-radius: 5px 5px 5px 5px;
+        border-radius: 5px 5px 5px 5px;
+      }
 
-        /* Banner */
+      li {
+        list-style: none;
+      }
 
-        #banner h2 span {
-            font-size: 2.25em;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            padding: 5px;
-        }
+      /* Button */
 
-        #banner p {
-            font-size: 1.25em;
-        }
+      .button {
+        -webkit-text-stroke-width: 0px;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        -ms-appearance: none;
+        appearance: none;
+        -moz-transition: background-color 0.2s ease-in-out,
+          color 0.2s ease-in-out;
+        -webkit-transition: background-color 0.2s ease-in-out,
+          color 0.2s ease-in-out;
+        -ms-transition: background-color 0.2s ease-in-out,
+          color 0.2s ease-in-out;
+        transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        background-color: #666;
+        border-radius: 6px;
+        border: 0;
+        cursor: pointer;
+        display: inline-block;
+        font-weight: 400;
+        height: 3em;
+        line-height: 3em;
+        padding: 0 2em;
+        text-align: center;
+        text-decoration: none;
+        white-space: nowrap;
+      }
 
-        #banner {
-            padding: 5em 3em 4em 3em;
-        }
+      /* Banner */
 
-        html {
-            height: 100%
-        }
+      #banner h2 span {
+        font-size: 2.25em;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        padding: 10px;
+      }
 
-        section {
-            margin: 0;
-            padding: 0;
-            border: 0;
-            font-size: 100%;
-            font: inherit;
-            vertical-align: baseline;
-        }
+      #banner p {
+        font-size: 1.25em;
+      }
+
+      #banner {
+        padding: 5em 3em 4em 3em;
+      }
+
+      html {
+        height: 100%;
+      }
+
+      section {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        font-size: 100%;
+        vertical-align: baseline;
+      }
     </style>
-</head>
-<body >
-<section id="banner">
-    <h2><span>Smart City Reporting System</span></h2>
-    <ul class="actions special">
-
+  </head>
+  <body>
+    <section id="banner">
+      <h2><span>Smart City Reporting System</span></h2>
+      <ul class="actions special">
         <li><a href="/report" class="button">Report Issue</a></li>
         <li><a href="/find" class="button">Find Issue</a></li>
         <li><a href="/login" class="button">Employee Login</a></li>
-
-    </ul>
-</section>
-</body>
+      </ul>
+    </section>
+  </body>
 </html>

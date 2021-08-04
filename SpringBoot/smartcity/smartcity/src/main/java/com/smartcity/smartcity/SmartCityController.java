@@ -248,6 +248,12 @@ public class SmartCityController implements CommandLineRunner {
 
         return "redirect:/employee";
     }
+//    @PostMapping("/EmployeeHome")
+//    public String employeeHome(RedirectAttributes redirectAttributes) {
+//
+//
+//    }
+//
     @PostMapping("/find")
     public String submitFind(@ModelAttribute("data") GetData body, RedirectAttributes redirectAttributes) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();

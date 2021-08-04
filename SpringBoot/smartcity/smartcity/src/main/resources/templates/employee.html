@@ -1,15 +1,19 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Employee Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+    <title>Employee Select</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <style>
         body {
             background-color: rgb(210, 255, 200);
             margin: 20px;
+            font-family: 'Open Sans', sans-serif;
+
         }
         div {
-            font-family: monospace;
             font-size: 20px;
             margin-top: 5px;
         }
@@ -38,6 +42,74 @@
         }
         h2 {
             font-family: sans-serif
+        }
+        
+    #button {
+        text-align: center;
+       -webkit-text-stroke-width: 0px;
+       -moz-appearance: none;
+       -webkit-appearance: none;
+       -ms-appearance: none;
+       appearance: none;
+       -moz-transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+       -webkit-transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+       -ms-transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+       transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+       background-color: #2da0da;
+       border-radius: 6px;
+       border: 0;
+       cursor: pointer;
+       display: inline-block;
+       font-weight: 400;
+       height: 3em;
+       line-height: 3em;
+       padding: 0 2em;
+       text-align: center;
+       text-decoration: none;
+       white-space: nowrap;
+       font-family: 'Open Sans', sans-serif;
+       color:white;
+       margin: 10px;
+
+   }
+   #button:hover {
+       background-color: #39ade7ce;
+       
+   }
+
+   #button:active {
+       background-color: #39ade775;
+   }
+   #button:active  {
+       -moz-transform: scale(0.95);
+       -webkit-transform: scale(0.95);
+       -o-transform: scale(0.95);
+       -ms-transform: scale(0.95);
+       transform: scale(0.95);
+   }
+        .center {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+            min-height: 100%;
+            padding-top: 100px;
+        }
+        
+        #container {
+            -webkit-border-radius: 10px 10px 10px 10px;
+            border-radius: 10px 10px 10px 10px;
+            background: #fff;
+            padding: 30px;
+            width: 90%;
+            height: 90%;
+
+            position: relative;
+            padding: 10px;
+            -webkit-box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
+            box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
+            text-align: center;
         }
     </style>
 </head>
@@ -96,61 +168,59 @@ function addAllColumnHeaders(arr, table) {
     return columnSet;
 }
 document.body.appendChild(buildHtmlTable(results));">
-<div th:if="${employee}">
-    <h2 id ="employee" th:text="${employee}"/>
-</div>
+<div class="center">
+    <div id="container">
+        <div th:if="${employee}">
+            <h2 id ="employee" th:text="${employee}"/>
+        </div>
+        <div id ="employees"> Welcome,
+            <span th:if="${first_name}">
+            <text id ="first_name" th:text="${first_name}"></text>
+            </span>
+            <span th:if="${last_name}">
+            <text id="last_name" th:text="${last_name}"></text>.
+            </span>
+            <span>Your current status is: </span>
+            <span th:if="${current_status}">
+            <text id="current_status" th:text="${current_status}"></text>.
+            </span>
+        </div>
+        <br>
+        <div>Your department is:
+            <span th:if="${department}">
+            <text id ="department" th:text="${department}"></text>
+            </span>
+        </div>
+        <form th:action="@{/employee}" method="post">
+            <div>
+                <label for="id"  >Choose Ticket ID: </label>
+                <input type="number" name="id" placeholder="ID" id="id" min="1">
+            </div>
+            <div>
+                <label for="status">Select "In Progress" to take up issue or "Complete" if the issue has been resolved:</label>
+                <select name="status" id="status">
+                    <option value="In Progress">In Progress</option>
+                    <option value="Complete">Complete</option>
+                </select>
+                <input type="hidden" value =""  name="employee_id" id="employee_id">
+            </div>
+            <br>
+            <input id ="button" type="submit">
 
-<div id ="employees"> Welcome,
-    <span th:if="${first_name}">
-    <text id ="first_name" th:text="${first_name}">
-    </text>
-    </span>
-    <span th:if="${last_name}">
-    <text id="last_name" th:text="${last_name}">
-    </text>.
-    </span>
-    <span>Your current status is: </span>
-    <span th:if="${current_status}">
-    <text id="current_status" th:text="${current_status}">
-    </text>.
-    </span>
-</div>
-<br>
-<div>Your department is:
-    <span th:if="${department}">
-    <text id ="department" th:text="${department}">
-    </text>
-    </span>
-</div>
-<form th:action="@{/employee}" method="post">
-    <div>
-        <label for="id">Choose Ticket ID: </label>
-        <input type="number" name="id" placeholder="ID" id="id">
+            <text id ="id_text" th:text="${employee_id}"></text>
+            <script>
+                document.getElementById("employee_id").value = document.getElementById("id_text").innerHTML;
+            </script>
+        </form>
+
+        <br><br>
+
+        <div th:if="${message}">
+            <h2 id ="message" th:text="${message}"></h2>
+        </div><br>
+        <h2>If you aren't currently working on an issue, see below for all the available issues in your department.<br>
+        If you are working on an issue, see it below:</h2>
     </div>
-    <div>
-        <label for="status">Select "In Progress" to take up issue or "Complete" if the issue has been resolved:</label>
-        <select name="status" id="status">
-            <option value="In Progress">In Progress</option>
-            <option value="Complete">Complete</option>
-        </select>
-        <input type="hidden" value =""  name="employee_id" id="employee_id">
-    </div>
-    <br>
-    <input type="submit">
-
-    <text id ="id_text" th:text="${employee_id}">
-    </text>
-    <script>
-        document.getElementById("employee_id").value = document.getElementById("id_text").innerHTML;
-    </script>
-</form>
-
-<br><br>
-
-<div th:if="${message}">
-    <h2 id ="message" th:text="${message}"/>
-</div><br>
-<h2>If you aren't currently working on an issue, see below for all the available issues in your department.<br>
-If you are working on an issue, see it below:</h2>
+</div>
 </body>
 </html>
