@@ -10,28 +10,34 @@
         body {
             background-color: rgb(210, 255, 200);
             font-family: 'Open Sans', sans-serif;
-
         }
         #header {
-            /*font-family: sans-serif;
-            color: blue;*/
             text-align: center;
         }
-        h1 {
-            text-align: center;
-            padding-bottom:15px;
-            border-bottom: 1px solid black;
-          }
+       
         div {
             margin-top: 5px;
         }
+        #header{
+            padding: 5px;
+            border-bottom: 1px solid black;
+            
+        }
+        
         #message {
             display: none;
         }
-        table {
-            width: 100%;
-            font-family: sans-serif;
+        #table{
+            padding-top:5px;
+            width: 85%;
+            height: 70%;
+            justify-content: center; 
+             padding-left: 7.5%;
+            padding-right: 7.5%;
+        }
+         table {
             border: 1px solid rgba(0, 0, 0, 0.5);
+            
         }
         tr:nth-child(even) {
             background-color: rgb(230, 230, 230);
@@ -42,7 +48,6 @@
         
       
         #button {
-             text-align: center;
             -webkit-text-stroke-width: 0px;
             -moz-appearance: none;
             -webkit-appearance: none;
@@ -58,8 +63,8 @@
             cursor: pointer;
             display: inline-block;
             font-weight: 400;
-            height: 3em;
-            line-height: 3em;
+            height: 2.5em;
+            line-height: 2em;
             padding: 0 2em;
             text-align: center;
             text-decoration: none;
@@ -84,6 +89,8 @@
             -ms-transform: scale(0.95);
             transform: scale(0.95);
         }
+
+    
         .center {
             display: flex;
             align-items: center;
@@ -100,28 +107,39 @@
             background: #fff;
             padding: 30px;
             width: 90%;
-            max-width: 680px;
+            max-width: 780px;
             /*height: 200px;*/
             height: 90%;
-
             position: relative;
             padding: 10px;
             -webkit-box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
             box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
             text-align: center;
         }
+        #button_header{
+            padding-left:35px;
+
+        }
+         #search_header {
+            padding-top: 0px;
+            font-size: 28px;
+          }
     </style>
 </head>
 <body>
     <div class="center">
         <div id="container">
-            <h1 id="header">Search Results</h1>
-            <div th:if="${message}">
+            <div id ="header">
+            <span id ="search_header">Search Results</span>
+            <span th:if="${message}">
                 <h2 id ="message" th:text="${message}"></h2>
-            </div>
-            <div>
+            </span>
+            <span id ="button_header">
                 <a href="/"><button id ="button">Home</button></a>
                 <a href="/find"><button id ="button">Find Another Issue</button></a>
+            </span>
+            </div>
+            <div id ="table">
             </div>
         </div>
     </div>
@@ -177,7 +195,9 @@ function addAllColumnHeaders(arr, table) {
     table.appendChild(tr);
     return columnSet;
 }
-document.body.appendChild(buildHtmlTable(results));
+
+const element = document.getElementById('table');
+element.appendChild(buildHtmlTable(results));
 </script>
 </body>
 </html>

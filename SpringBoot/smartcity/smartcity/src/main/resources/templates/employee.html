@@ -14,8 +14,22 @@
 
         }
         div {
-            font-size: 20px;
+            font-size: 18px;
             margin-top: 5px;
+        }
+        #see_below{
+            font-size: 15px;
+        }
+        #underline{
+            padding-bottom:15px;
+            border-bottom: 1px solid black;
+        }
+        #underline2{
+            padding-bottom:5px;
+            border-bottom: 1px solid black;
+        }
+        #log_back_in{
+            font-size: 14px;
         }
         #id{
             width: 50px;
@@ -26,10 +40,17 @@
         #id_text {
             display: none;
         }
+        #table{
+            padding-top:5px;
+            width: 75%;
+            height: 70%;
+            justify-content: center; 
+             padding-left: 12.5%;
+            padding-right: 12.5%;
+        }
          table {
-            width: 100%;
-            font-family: sans-serif;
             border: 1px solid rgba(0, 0, 0, 0.5);
+            
         }
         tr:nth-child(even) {
             background-color: rgb(230, 230, 230);
@@ -41,7 +62,7 @@
             color: blue
         }
         h2 {
-            font-family: sans-serif
+            font-size: 20px;
         }
         
     #button {
@@ -94,7 +115,7 @@
             justify-content: center;
             width: 100%;
             min-height: 100%;
-            padding-top: 100px;
+            padding-top: 50px;
         }
         
         #container {
@@ -104,7 +125,6 @@
             padding: 30px;
             width: 90%;
             height: 90%;
-
             position: relative;
             padding: 10px;
             -webkit-box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
@@ -116,11 +136,11 @@
 <body onload="
 const results = JSON.parse(document.getElementById('message').innerHTML)[0];
 
+
 var _table_ = document.createElement('table'),
     _tr_ = document.createElement('tr'),
     _th_ = document.createElement('th'),
     _td_ = document.createElement('td');
-
 // Builds the HTML Table out of myList json data from Ivy restful service.
 function buildHtmlTable(arr) {
     var table = _table_.cloneNode(false),
@@ -167,59 +187,64 @@ function addAllColumnHeaders(arr, table) {
     table.appendChild(tr);
     return columnSet;
 }
-document.body.appendChild(buildHtmlTable(results));">
+const element = document.getElementById('table');
+element.appendChild(buildHtmlTable(results));">
 <div class="center">
     <div id="container">
         <div th:if="${employee}">
             <h2 id ="employee" th:text="${employee}"/>
         </div>
-        <div id ="employees"> Welcome,
+        <b><div id ="employees"> Welcome,
             <span th:if="${first_name}">
             <text id ="first_name" th:text="${first_name}"></text>
             </span>
             <span th:if="${last_name}">
             <text id="last_name" th:text="${last_name}"></text>.
             </span>
-            <span>Your current status is: </span>
+        </div>
+        <div id ="underline">Your department is: 
+            <span th:if="${department}">
+                <text id ="department" th:text="${department}"></text>.
+                </span>
+            <span> Your current status is: </span>
             <span th:if="${current_status}">
             <text id="current_status" th:text="${current_status}"></text>.
             </span>
-        </div>
-        <br>
-        <div>Your department is:
-            <span th:if="${department}">
-            <text id ="department" th:text="${department}"></text>
+        </div></b>
+            <div id ="underline2">
+                If you would like to browse current issues, select "Find Issue" 
+                <span id ="log_back_in">(You will need to log back in)</span>
+                <a href="find"><button id="button">Find Issue</button></a>
+            </div>
+            <span id ="issue_below">
+            Otherwise, choose an issue to undertake from the following below:
+        </span> 
+        <div id = "see_below"><b>(If you aren't currently working on an issue, see below for all "Open" issues in your department.<br>
+            If you are working on an issue, you will see an "In Progress" issue.)</b></div>
+            <span th:if="${message}">
+                <h3 id ="message" th:text="${message}"></h3>
             </span>
-        </div>
+            <div id ="table">
+            </div>
         <form th:action="@{/employee}" method="post">
             <div>
-                <label for="id"  >Choose Ticket ID: </label>
-                <input type="number" name="id" placeholder="ID" id="id" min="1">
-            </div>
-            <div>
-                <label for="status">Select "In Progress" to take up issue or "Complete" if the issue has been resolved:</label>
+              Select "In Progress" to take up an issue or "Complete" if the issue has been resolved:
                 <select name="status" id="status">
                     <option value="In Progress">In Progress</option>
                     <option value="Complete">Complete</option>
                 </select>
                 <input type="hidden" value =""  name="employee_id" id="employee_id">
             </div>
-            <br>
+            <div>
+                <label for="id">Select Issue ID: </label>
+                <input type="number" name="id" placeholder="ID" id="id" min="1" required>
+            </div>
             <input id ="button" type="submit">
-
             <text id ="id_text" th:text="${employee_id}"></text>
             <script>
                 document.getElementById("employee_id").value = document.getElementById("id_text").innerHTML;
             </script>
         </form>
-
-        <br><br>
-
-        <div th:if="${message}">
-            <h2 id ="message" th:text="${message}"></h2>
-        </div><br>
-        <h2>If you aren't currently working on an issue, see below for all the available issues in your department.<br>
-        If you are working on an issue, see it below:</h2>
     </div>
 </div>
 </body>

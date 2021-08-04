@@ -136,7 +136,7 @@ public class SmartCityController implements CommandLineRunner {
     }
 
     @PostMapping("/employee")
-    public void employeeUpdate(@RequestParam("id") int id, @RequestParam("status") String status,@RequestParam("employee_id") String employee_id_str) throws IOException {
+    public String employeeUpdate(@RequestParam("id") int id, @RequestParam("status") String status,@RequestParam("employee_id") String employee_id_str) throws IOException {
         int employee_id = Integer.parseInt(employee_id_str);
         String bodyString = String.format("{\"id\":%d,\"current_status\":\""+status+"\",\"employee_id\":%d}",id,employee_id);
         WebClient client = WebClient.create(env.getProperty("apiURL"));
@@ -147,6 +147,7 @@ public class SmartCityController implements CommandLineRunner {
             return response.bodyToMono(String.class);
         });
         resp.subscribe(System.out::println);
+        return "EmployeeThankYou";
     }
 
     @PostMapping("/report")
@@ -245,15 +246,10 @@ public class SmartCityController implements CommandLineRunner {
         redirectAttributes.addFlashAttribute("current_status", current_status);
         redirectAttributes.addFlashAttribute("department", department);
         redirectAttributes.addFlashAttribute("employee_id", employee_id);
-
+    
         return "redirect:/employee";
     }
-//    @PostMapping("/EmployeeHome")
-//    public String employeeHome(RedirectAttributes redirectAttributes) {
-//
-//
-//    }
-//
+
     @PostMapping("/find")
     public String submitFind(@ModelAttribute("data") GetData body, RedirectAttributes redirectAttributes) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
@@ -323,5 +319,9 @@ public class SmartCityController implements CommandLineRunner {
     @GetMapping("/thanks")
     public String getThanksPage() {
         return "ThankYouPage";
+    }
+    @GetMapping("/employeeSuccess")
+    public String getEmployeeThanksPage() {
+        return "EmployeeThankYou";
     }
 }
