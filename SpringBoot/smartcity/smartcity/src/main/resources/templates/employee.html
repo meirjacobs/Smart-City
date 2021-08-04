@@ -131,6 +131,9 @@
             box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
             text-align: center;
         }
+        #open{
+            font-size: 17px;
+        }
     </style>
 </head>
 <body onload="
@@ -228,8 +231,9 @@ element.appendChild(buildHtmlTable(results));">
             </div>
         <form th:action="@{/employee}" method="post">
             <div>
-              Select "In Progress" to take up an issue or "Complete" if the issue has been resolved:
+             Select "In Progress" to take up an issue or "Complete" if the issue has been resolved.  <div id="open">Alternatively, if you want to withdraw from an already "In Progress" issue, select "Open".</div>
                 <select name="status" id="status">
+                    <option value="Open">Open</option>
                     <option value="In Progress">In Progress</option>
                     <option value="Complete">Complete</option>
                 </select>
