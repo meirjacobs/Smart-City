@@ -120,7 +120,7 @@ def test_no_image(mysql_cursor):
     mycursor.execute(f"SELECT COUNT(*) FROM problems WHERE problem_description = '{prefix}-test1'")
     assert mycursor.fetchone()[0] == 1
     mycursor.execute(f"DELETE FROM problems WHERE problem_description = '{prefix}-test1'")
-    time.sleep(2)
+    time.sleep(3)
     mycursor.execute(f"SELECT COUNT(*) FROM logs_history WHERE problem_description = '{prefix}-test1'")
     assert mycursor.fetchone()[0] == 1
     mycursor.execute(f"DELETE FROM logs_history WHERE problem_description = '{prefix}-test1'")
@@ -143,7 +143,7 @@ def test_one_image(mysql_cursor):
     mycursor.execute(f"SELECT COUNT(*) FROM problems WHERE problem_description = '{prefix}-test2'")
     assert mycursor.fetchone()[0] == 1
     mycursor.execute(f"DELETE FROM problems WHERE problem_description = '{prefix}-test2'")
-    time.sleep(2)
+    time.sleep(3)
     mycursor.execute(f"SELECT COUNT(*) FROM logs_history WHERE problem_description = '{prefix}-test2'")
     assert mycursor.fetchone()[0] == 1
     mycursor.execute(f"DELETE FROM logs_history WHERE problem_description = '{prefix}-test2'")
@@ -169,7 +169,7 @@ def test_multiple_images(mysql_cursor):
     mycursor.execute(f"SELECT COUNT(*) FROM problems WHERE problem_description = '{prefix}-test3'")
     assert mycursor.fetchone()[0] == 1
     mycursor.execute(f"DELETE FROM problems WHERE problem_description = '{prefix}-test3'")
-    time.sleep(2)
+    time.sleep(3)
     mycursor.execute(f"SELECT COUNT(*) FROM logs_history WHERE problem_description = '{prefix}-test3'")
     assert mycursor.fetchone()[0] == 1
     mycursor.execute(f"DELETE FROM logs_history WHERE problem_description = '{prefix}-test3'")

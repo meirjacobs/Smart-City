@@ -189,7 +189,7 @@ def test_open_to_in_progress(mysql_cursor): # update employee & problem + log
         url,
         body = json.dumps(test_body)
     )
-    time.sleep(2)
+    time.sleep(3)
     assert response.status == 200
     assert response.data == b'Success! ID ' + str(id_number).encode() + b' updated to ' + 'In Progress'.encode()
     mycursor.execute(f"SELECT current_status FROM problems WHERE id = {id_number}")
@@ -221,7 +221,7 @@ def test_in_progress_to_open(mysql_cursor): # update employee & problem + log
         url,
         body = json.dumps(test_body)
     )
-    time.sleep(2)
+    time.sleep(3)
     assert response.status == 200
     assert response.data == b'Success! ID ' + str(id_number).encode() + b' updated to ' + 'Open'.encode()
     mycursor.execute(f"SELECT current_status FROM problems WHERE id = {id_number}")
@@ -253,7 +253,7 @@ def test_open_to_complete(mysql_cursor): # update employee & problem + log
         url,
         body = json.dumps(test_body)
     )
-    time.sleep(2)
+    time.sleep(3)
     assert response.status == 200
     assert response.data == b'Success! ID ' + str(id_number).encode() + b' updated to ' + 'Complete'.encode()
     mycursor.execute(f"SELECT COUNT(*) FROM problems WHERE id = {id_number}")
@@ -284,7 +284,7 @@ def test_in_progress_to_complete(mysql_cursor): # update employee & problem + lo
         url,
         body = json.dumps(test_body)
     )
-    time.sleep(2)
+    time.sleep(3)
     assert response.status == 200
     assert response.data == b'Success! ID ' + str(id_number).encode() + b' updated to ' + 'Complete'.encode()
     mycursor.execute(f"SELECT COUNT(*) FROM problems WHERE id = {id_number}")
