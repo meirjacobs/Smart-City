@@ -2,6 +2,7 @@ atomicwrites==1.4.0
 attrs==21.2.0
 colorama==0.4.4
 iniconfig==1.1.1
+﻿mysql-connector==2.2.9
 packaging==21.0
 pluggy==0.13.1
 py==1.10.0
