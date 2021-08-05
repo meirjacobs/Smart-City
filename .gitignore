@@ -1,9 +1,10 @@
 .idea/
+.mvn/
 __pycache__/
 .pytest_cache/
 *.class
+*.env
 *.iml
-.mvn/
 mvnw
 mvnw.cmd
 SmartcityApplicationTests.java
