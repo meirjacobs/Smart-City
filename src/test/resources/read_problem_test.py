@@ -1,13 +1,17 @@
 import datetime
 import json
+import os
+import uuid
 
 import mysql.connector
 import pytest
 import urllib3
+from dotenv import load_dotenv
 
+load_dotenv()
+url = os.environ["URL"]
 http = urllib3.PoolManager()
-url = "https://rpixnvd51i.execute-api.us-east-1.amazonaws.com/deployedStage"
-
+prefix = uuid.uuid4()
 
 def test_invalid_id_type():
     query = {
@@ -180,39 +184,26 @@ def test_only_distance():
     assert response.status == 400
     assert response.data == b"'distance' must always be paired with 'location'"
 
-def test_full_param_search():
+def test_full_param_search(mysql_cursor):
+    mycursor = mysql_cursor
     insert = "INSERT INTO problems (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
-    val = ("Road Hazard", "test - street sign in middle of the road", 35.21962829400858, 31.78087640916267, "https://www.test.com/1")
+    val = ("Road Hazard", f"{prefix}-test1", 35.21962829400858, 31.78087640916267, "https://www.test.com/1")
     mycursor.execute(insert, val)
+    id_number = mycursor.lastrowid
     now = datetime.datetime.utcnow()
     one_minute = datetime.timedelta(minutes=1)
     start_time = datetime.datetime.strftime(now - one_minute, '%Y-%m-%dT%H:%M')
     end_time = datetime.datetime.strftime(now + one_minute, '%Y-%m-%dT%H:%M')
     time_query = f"{start_time},{end_time}"
-    id_number = get_id_number()
     query = {
-        "id": id_number, # figure out what to do with this
+        "id": id_number,
         "problem_type": "Road Hazard",
-        "problem_description": "test - street sign in middle of the road",
+        "problem_description": f"{prefix}-test1",
         "time_found": time_query,
         "current_status": "Open",
         "location": "31.78087640916267,35.21962829400858",
         "distance": 3,
-        "image_path": 'https://s3.console.aws.amazon.com/s3/buckets/smartcitystack-smartcitys3bucket-21vjidos6mgc?prefix=1/'
-  }
-    response = http.request(
-        "GET",
-        url,
-        fields = query
-    )
-    assert response.status == 200
-    assert len(json.loads(response.data)) == 1
-    # assert response.data == b
-    clean_up(id_number=id_number)
-
-def test_id():
-    query = {
-        "id": 1 # figure out what to do with this
+        "image_path": "https://www.test.com/1"
     }
     response = http.request(
         "GET",
@@ -221,22 +212,16 @@ def test_id():
     )
     assert response.status == 200
     assert len(json.loads(response.data)) == 1
+    mycursor.execute(f"DELETE FROM problems WHERE problem_description = '{prefix}-test1'")
 
-def test_problem_type():
+def test_id(mysql_cursor):
+    mycursor = mysql_cursor
+    insert = "INSERT INTO problems (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
+    val = ("Other", f"{prefix}-test2", 35.21962829400858, 31.78087640916267, "https://www.test.com/2")
+    mycursor.execute(insert, val)
+    id_number = mycursor.lastrowid
     query = {
-        "problem_type": "Criminal Act"
-    }
-    response = http.request(
-        "GET",
-        url,
-        fields = query
-    )
-    assert response.status == 200
-    # assert len(json.loads(response.data)) == 3
-
-def test_problem_description():
-    query = {
-        "problem_description": "test - bank heist 2"
+        "id": id_number
     }
     response = http.request(
         "GET",
@@ -245,9 +230,45 @@ def test_problem_description():
     )
     assert response.status == 200
     assert len(json.loads(response.data)) == 1
-    # assert response.data == b
+    mycursor.execute(f"DELETE FROM problems WHERE problem_description = '{prefix}-test2'")
 
-def test_time_found():
+def test_problem_type(mysql_cursor):
+    mycursor = mysql_cursor
+    mycursor.execute(f"SELECT COUNT(*) FROM problems WHERE problem_type = 'Fire'")
+    count = mycursor.fetchone()[0]
+    query = {
+        "problem_type": "Fire"
+    }
+    response = http.request(
+        "GET",
+        url,
+        fields = query
+    )
+    assert response.status == 200
+    assert len(json.loads(response.data)) == count
+
+def test_problem_description(mysql_cursor):
+    mycursor = mysql_cursor
+    insert = "INSERT INTO problems (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
+    val = ("Other", f"{prefix}-test3", 35.21962829400858, 31.78087640916267, "https://www.test.com/3")
+    mycursor.execute(insert, val)
+    query = {
+        "problem_description": f"{prefix}-test3"
+    }
+    response = http.request(
+        "GET",
+        url,
+        fields = query
+    )
+    assert response.status == 200
+    assert len(json.loads(response.data)) == 1
+    mycursor.execute(f"DELETE FROM problems WHERE problem_description = '{prefix}-test3'")
+
+def test_time_found(mysql_cursor):
+    mycursor = mysql_cursor
+    insert = "INSERT INTO problems (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
+    val = ("Other", f"{prefix}-test4", 35.21962829400858, 31.78087640916267, "https://www.test.com/4")
+    mycursor.execute(insert, val)
     now = datetime.datetime.utcnow()
     one_minute = datetime.timedelta(minutes=1)
     start_time = datetime.datetime.strftime(now - one_minute, '%Y-%m-%dT%H:%M')
@@ -262,12 +283,22 @@ def test_time_found():
         fields = query
     )
     assert response.status == 200
-    assert len(json.loads(response.data)) == 3
-    # assert response.data == b
+    assert len(json.loads(response.data)) == 1
+    mycursor.execute(f"DELETE FROM problems WHERE problem_description = '{prefix}-test4'")
 
-def test_location_distance():
+def test_location_distance(mysql_cursor):
+    mycursor = mysql_cursor
+    mycursor.execute("SELECT COUNT(*) FROM problems WHERE ST_Distance_Sphere(point(61.995984186670654, -80.55866399039516), location) <= 1500")
+    count = mycursor.fetchone()[0]
+    insert = "INSERT INTO problems (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
+    vals = [
+        ("Other", f"{prefix}-test5", 62.04679595396581, -80.56541973822662, "https://www.test.com/5"),
+        ("Vehicle Damage", f"{prefix}-test6", 61.93281280030372, -80.56373125049183, "https://www.test.com/6"),
+        ("'Environmental Hazard", f"{prefix}-test7", 61.99667083217465, -80.54705544360307, "https://www.test.com/7")
+    ]
+    mycursor.executemany(insert, vals)
     query = {
-        "location": "31.78087640916267,35.21962829400858",
+        "location": "-80.55866399039516, 61.995984186670654",
         "distance": 3
     }
     response = http.request(
@@ -276,11 +307,18 @@ def test_location_distance():
         fields = query
     )
     assert response.status == 200
-    # assert len(json.loads(response.data)) == 3
+    assert len(json.loads(response.data)) == count+3
+    mycursor.execute(f"DELETE FROM problems WHERE problem_description = '{prefix}-test5'")
+    mycursor.execute(f"DELETE FROM problems WHERE problem_description = '{prefix}-test6'")
+    mycursor.execute(f"DELETE FROM problems WHERE problem_description = '{prefix}-test7'")
 
-def test_image_path(): # fix for updated url
+def test_image_path(mysql_cursor):
+    mycursor = mysql_cursor
+    insert = "INSERT INTO problems (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
+    val = ("Other", f"{prefix}-test8", 51.338101799940105, 35.699658241009146, f"https://www.test.com/{prefix}")
+    mycursor.execute(insert, val)
     query = {
-        "image_path": 'https://s3.console.aws.amazon.com/s3/buckets/smartcitystack-smartcitys3bucket-21vjidos6mgc?prefix=1/'
+        "image_path": f"https://www.test.com/{prefix}"
     }
     response = http.request(
         "GET",
@@ -288,4 +326,5 @@ def test_image_path(): # fix for updated url
         fields = query
     )
     assert response.status == 200
-    # assert len(json.loads(response.data)) == 1
+    assert len(json.loads(response.data)) == 1
+    mycursor.execute(f"DELETE FROM problems WHERE problem_description = '{prefix}-test8'")
