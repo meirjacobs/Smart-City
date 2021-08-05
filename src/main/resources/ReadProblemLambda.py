@@ -15,6 +15,8 @@ def lambda_handler(event, context):
     event_body = event["queryStringParameters"]
 
     # connect to MySQL
+    global mydb
+    global mycursor
     mydb, mycursor = smart_city.db_connect()
 
     # check input to ensure it is valid & initialize search string
@@ -26,6 +28,8 @@ def lambda_handler(event, context):
 
     # get and format data from problems table
     search_results = search_problems(search)
+    mycursor.close()
+    mydb.close()
     return {
         "statusCode": 200,
         "body": json.dumps(search_results)

@@ -4,7 +4,7 @@ import boto3
 
 import mysql.connector
 
-def db_connect(): # move to general file
+def db_connect():
     sm_client = boto3.client("secretsmanager")
     secret = sm_client.get_secret_value(SecretId='MySQL-Credentials')
     credentials = json.loads(secret['SecretString'])
