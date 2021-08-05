@@ -38,7 +38,6 @@
             text-align: center;
         }
         #submit {
-            padding: 20px;
             margin: 10px;
             background-color: rgb(255, 255, 210);
             border-radius: 10px;
@@ -47,7 +46,7 @@
             cursor: pointer;
             background-color: rgb(230, 230, 190);
         }
-      
+
         #submit {
              text-align: center;
             -webkit-text-stroke-width: 0px;
@@ -65,7 +64,7 @@
             cursor: pointer;
             display: inline-block;
             font-weight: 400;
-            height: 3em;
+            height: 2.85em;
             line-height: 3em;
             padding: 0 2em;
             text-align: center;
@@ -74,10 +73,12 @@
             font-family: 'Open Sans', sans-serif;
             color:white;
 
+
         }
+
         #submit:hover {
             background-color: #39ade7ce;
-            
+
         }
 
         #submit:active {
@@ -103,7 +104,7 @@
             width: 100%;
             min-height: 100%;
         }
-        
+
         #container {
             -webkit-border-radius: 10px 10px 10px 10px;
             border-radius: 10px 10px 10px 10px;
@@ -120,45 +121,49 @@
         #text1{
             font-size: 1.3em;
         }
+        #whitespace{
+            padding: 25px;
+        }
     </style>
 </head>
 <body>
-    <div class="center">
-        <div id="container">
-            <h1 id="header">Find Issue</h1>
-            <div id= "text1">Enter the following informaton to find an issue:</div>
-            <div>(Please fill out at least one field)</div>
-            <form th:action="@{/find}" th:object="${data}" method="post">
-                <div> Issue ID #: <input type="number" min="1" step="1" name="id"></div>
-                <div>Problem Type:
-                    <select name="problemType">
-                        <option>Any</option>
-                        <option>Road Hazard</option>
-                        <option>Criminal Act</option>
-                        <option>Environmental Hazard</option>
-                        <option>Vehicle Damage</option>
-                        <option>Fire</option>
-                        <option>Water Damage</option>
-                        <option>Other</option>
-                    </select></div>
-                <div>Location: Within <input type="number" name="distance"> km of</div>
-                <div>Latitude <input id="latitude" type="number" step="any" min="-180" max="180" name="latitude"> Longitude <input id="longitude" type="number" step="any" min="-180" max="180" name="longitude"></div>
-                <div> <button type="button" id = "current_location" return false>Use Current Location</button></div>
-                <div id="map"></div>
-                <div>Problem Description: <input name="problemDescription"></div>
-                <!--<div>Image: <input name="image" type="file"></div>-->
-                <div>Current Status:
-                    <select name="status">
-                        <option value="Any">Any</option>
-                        <option value="Open">Open</option>
-                        <option value="In Progress">In Progress</option>
-                    </select>
-                </div>
-                <div>Time Reported: Between <input type="datetime-local" name="startTime"> and <input type="datetime-local" name="endTime"></div>
-                <div id="button-container"><input id="submit" type="submit"></div>
-            </form>
-        </div>
+<div class="center">
+    <div id="container">
+        <h1 id="header">Find Issue <span id ="whitespace"></span><a href="/"><button id ="submit">Home</button></a>   </h1>
+
+        <div id= "text1">Enter the following informaton to find an issue:</div>
+        <div>(Please fill out at least one field)</div>
+        <form th:action="@{/find}" th:object="${data}" method="post">
+            <div> Issue ID #: <input type="number" min="1" step="1" name="id"></div>
+            <div>Problem Type:
+                <select name="problemType">
+                    <option>Any</option>
+                    <option>Road Hazard</option>
+                    <option>Criminal Act</option>
+                    <option>Environmental Hazard</option>
+                    <option>Vehicle Damage</option>
+                    <option>Fire</option>
+                    <option>Water Damage</option>
+                    <option>Other</option>
+                </select></div>
+            <div>Location: Within <input type="number" name="distance"> km of</div>
+            <div>Latitude <input id="latitude" type="number" step="any" min="-180" max="180" name="latitude"> Longitude <input id="longitude" type="number" step="any" min="-180" max="180" name="longitude"></div>
+            <div> <button type="button" id = "current_location" return false>Use Current Location</button></div>
+            <div id="map"></div>
+            <div>Problem Description: <input name="problemDescription"></div>
+            <!--<div>Image: <input name="image" type="file"></div>-->
+            <div>Current Status:
+                <select name="status">
+                    <option value="Any">Any</option>
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                </select>
+            </div>
+            <div>Time Reported: Between <input type="datetime-local" name="startTime"> and <input type="datetime-local" name="endTime"></div>
+            <div id="button-container"><input id="submit" type="submit"></div>
+        </form>
     </div>
+</div>
 <script >
 //Set up some of our variables.
 var map; //Will contain map object.

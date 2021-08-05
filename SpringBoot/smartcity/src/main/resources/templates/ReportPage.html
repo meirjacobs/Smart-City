@@ -8,7 +8,7 @@
     <title>Report Issue</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <style>
-      
+
         body {
             background-color: rgb(210, 255, 200);
             font-family: 'Open Sans', sans-serif;
@@ -23,9 +23,9 @@
         }
         div, input, select {
             margin-top: 10px;
-            
+
         }
-       
+
         #button {
             padding: 20px;
             margin: 10px;
@@ -36,7 +36,7 @@
             cursor: pointer;
             background-color: rgb(230, 230, 190);
         }
-      
+
         #button {
              text-align: center;
             -webkit-text-stroke-width: 0px;
@@ -54,9 +54,9 @@
             cursor: pointer;
             display: inline-block;
             font-weight: 400;
-            height: 3em;
+            height: 2.95em;
             line-height: 3em;
-            padding: 0 2em;
+            padding: 0 1.5em;
             text-align: center;
             text-decoration: none;
             white-space: nowrap;
@@ -66,7 +66,7 @@
         }
         #button:hover {
             background-color: #39ade7ce;
-            
+
         }
 
         #button:active {
@@ -92,7 +92,7 @@
             width: 100%;
             min-height: 100%;
         }
-        
+
         #container {
             -webkit-border-radius: 10px 10px 10px 10px;
             border-radius: 10px 10px 10px 10px;
@@ -106,37 +106,40 @@
             box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
             text-align: center;
         }
+        #whitespace{
+            padding: 25px;
+        }
     </style>
 
 </head>
 <body>
-    <div class="center">
-        <div id="container">
-            <h1 id="header">Report Issue</h1>
-            <div>Thank you for taking the time to report an issue. Problem Type and Location are required:</div>
-            <form th:action="@{/report}" enctype="multipart/form-data" method="post">
-                <div>Problem Type:
-                    <select name="problemType">
-                        <option>Road Hazard</option>
-                        <option>Criminal Act</option>
-                        <option>Environmental Hazard</option>
-                        <option>Vehicle Damage</option>
-                        <option>Fire</option>
-                        <option>Water Damage</option>
-                        <option>Other</option>
-                    </select></div>
-                <div>Location:
-                    <!-- <input type="button" onclick="getLocation()" return false> -->
-                    <button type="button" id = "current_location" return false>Use Current Location</button>
-                </div>
-                <div id="map"></div>
-                <div> Latitude <input th:required="required" type="number" id="latitude" step="any" name="latitude" > Longitude <input th:required="required" type="number" id="longitude" step="any" name="longitude" ></div>
-                <div>Problem Description: <input name="problemDescription"></div>
-                <div>Images: <input name="image" type="file" multiple></div>
-                <div id="button-container"><input id="button" type="submit"></div>
-            </form>
-        </div>
+<div class="center">
+    <div id="container">
+        <h1 id="header">Report Issue <span id ="whitespace"></span><a href="/"><button id ="button">Home</button></a>   </h1>
+        <div>Thank you for taking the time to report an issue. Problem Type and Location are required:</div>
+        <form th:action="@{/report}" enctype="multipart/form-data" method="post">
+            <div>Problem Type:
+                <select name="problemType">
+                    <option>Road Hazard</option>
+                    <option>Criminal Act</option>
+                    <option>Environmental Hazard</option>
+                    <option>Vehicle Damage</option>
+                    <option>Fire</option>
+                    <option>Water Damage</option>
+                    <option>Other</option>
+                </select></div>
+            <div>Location:
+                <!-- <input type="button" onclick="getLocation()" return false> -->
+                <button type="button" id = "current_location" return false>Use Current Location</button>
+            </div>
+            <div id="map"></div>
+            <div> Latitude <input th:required="required" type="number" id="latitude" step="any" name="latitude" > Longitude <input th:required="required" type="number" id="longitude" step="any" name="longitude" ></div>
+            <div>Problem Description: <input name="problemDescription"></div>
+            <div>Images: <input name="image" type="file" multiple></div>
+            <div id="button-container"><input id="button" type="submit"></div>
+        </form>
     </div>
+</div>
 
 
 

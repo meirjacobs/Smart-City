@@ -44,13 +44,13 @@
             padding-top:5px;
             width: 75%;
             height: 70%;
-            justify-content: center; 
+            justify-content: center;
              padding-left: 12.5%;
             padding-right: 12.5%;
         }
          table {
             border: 1px solid rgba(0, 0, 0, 0.5);
-            
+
         }
         tr:nth-child(even) {
             background-color: rgb(230, 230, 230);
@@ -64,7 +64,7 @@
         h2 {
             font-size: 20px;
         }
-        
+
     #button {
         text-align: center;
        -webkit-text-stroke-width: 0px;
@@ -95,7 +95,7 @@
    }
    #button:hover {
        background-color: #39ade7ce;
-       
+
    }
 
    #button:active {
@@ -115,18 +115,20 @@
             justify-content: center;
             width: 100%;
             min-height: 100%;
-            padding-top: 50px;
+            padding-top: 20px;
         }
-        
+
         #container {
             -webkit-border-radius: 10px 10px 10px 10px;
             border-radius: 10px 10px 10px 10px;
             background: #fff;
-            padding: 30px;
             width: 90%;
             height: 90%;
             position: relative;
-            padding: 10px;
+            padding-top: 0px;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-bottom: 10px;
             -webkit-box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
             box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
             text-align: center;
@@ -138,8 +140,6 @@
 </head>
 <body onload="
 const results = JSON.parse(document.getElementById('message').innerHTML)[0];
-
-
 var _table_ = document.createElement('table'),
     _tr_ = document.createElement('tr'),
     _th_ = document.createElement('th'),
@@ -170,7 +170,6 @@ function buildHtmlTable(arr) {
     }
     return table;
 }
-
 // Adds a header row to the table and returns the set of columns.
 // Need to do union of keys from all records as some records may not contain
 // all records
@@ -196,7 +195,8 @@ element.appendChild(buildHtmlTable(results));">
     <div id="container">
         <div th:if="${employee}">
             <h2 id ="employee" th:text="${employee}"/>
-        </div>
+        </div><div><a href="/"><button id ="button">Home</button></a>
+    </div>
         <b><div id ="employees"> Welcome,
             <span th:if="${first_name}">
             <text id ="first_name" th:text="${first_name}"></text>
@@ -205,33 +205,33 @@ element.appendChild(buildHtmlTable(results));">
             <text id="last_name" th:text="${last_name}"></text>.
             </span>
         </div>
-        <div id ="underline">Your department is: 
-            <span th:if="${department}">
+            <div id ="underline">Your department is:
+                <span th:if="${department}">
                 <text id ="department" th:text="${department}"></text>.
                 </span>
-            <span> Your current status is: </span>
-            <span th:if="${current_status}">
+                <span> Your current status is: </span>
+                <span th:if="${current_status}">
             <text id="current_status" th:text="${current_status}"></text>.
             </span>
-        </div></b>
-            <div id ="underline2">
-                If you would like to browse current issues, select "Find Issue" 
-                <span id ="log_back_in">(You will need to log back in)</span>
-                <a href="find"><button id="button">Find Issue</button></a>
-            </div>
-            <span id ="issue_below">
+            </div></b>
+        <div id ="underline2">
+            If you would like to browse current issues, select "Find Issue"
+            <span id ="log_back_in">(You will need to log back in)</span>
+            <a href="find"><button id="button">Find Issue</button></a>
+        </div>
+        <span id ="issue_below">
             Otherwise, choose an issue to undertake from the following below:
-        </span> 
+        </span>
         <div id = "see_below"><b>(If you aren't currently working on an issue, see below for all "Open" issues in your department.<br>
             If you are working on an issue, you will see an "In Progress" issue.)</b></div>
-            <span th:if="${message}">
+        <span th:if="${message}">
                 <h3 id ="message" th:text="${message}"></h3>
             </span>
-            <div id ="table">
-            </div>
+        <div id ="table">
+        </div>
         <form th:action="@{/employee}" method="post">
             <div>
-             Select "In Progress" to take up an issue or "Complete" if the issue has been resolved.  <div id="open">Alternatively, if you want to withdraw from an already "In Progress" issue, select "Open".</div>
+                Select "In Progress" to take up an issue or "Complete" if the issue has been resolved.  <div id="open">Alternatively, if you want to withdraw from an already "In Progress" issue, select "Open".</div>
                 <select name="status" id="status">
                     <option value="Open">Open</option>
                     <option value="In Progress">In Progress</option>

@@ -28,7 +28,7 @@ import java.util.List;
 public class SmartCityController implements CommandLineRunner {
 
     @Autowired
-    private Environment env;
+    private Environment     env;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
