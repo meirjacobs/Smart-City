@@ -5,6 +5,7 @@ import os
 import boto3
 
 import mysql.connector
+import smart_city
 
 event_body = None
 
@@ -14,7 +15,7 @@ def lambda_handler(event, context):
     event_body = event["queryStringParameters"]
 
     # connect to MySQL
-    mysql_connect()
+    mydb, mycursor = smart_city.db_connect()
 
     # check input to ensure it is valid & initialize search string
     search = validate_input()
@@ -29,21 +30,6 @@ def lambda_handler(event, context):
         "statusCode": 200,
         "body": json.dumps(search_results)
     }
-
-def mysql_connect():
-    sm_client = boto3.client("secretsmanager")
-    secret = sm_client.get_secret_value(SecretId='MySQL-Credentials')
-    credentials = json.loads(secret['SecretString'])
-    global mydb
-    mydb = mysql.connector.connect(
-        host=credentials['host'],
-        user=credentials['username'],
-        password=credentials['password'],
-        database=credentials['dbname']
-    )
-    global mycursor
-    mycursor = mydb.cursor()
-    
 
 def validate_input():
     search_string = "SELECT * FROM problems WHERE "

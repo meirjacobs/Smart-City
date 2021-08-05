@@ -4,6 +4,7 @@ import boto3
 import urllib3
 
 import mysql.connector
+import smart_city
 
 event_body = None
 mydb = None
@@ -20,7 +21,7 @@ def lambda_handler(event, context):
         return invalid
     
     # connect to MySQL
-    mysql_connect()
+    mydb, mycursor = smart_city.db_connect()
 
     # ensure email is unique within database
     invalid_email = validate_email()
@@ -86,20 +87,6 @@ def validate_input():
             'statusCode': 400,
             'body': "'department' is a required field and must be 'Criminal Act', 'Environmental Hazard', 'Road Hazard', 'Vehicle Damage', 'Fire', 'Water Damage', or 'Other'"
         }
-
-def mysql_connect():
-    sm_client = boto3.client("secretsmanager")
-    secret = sm_client.get_secret_value(SecretId='MySQL-Credentials')
-    credentials = json.loads(secret['SecretString'])
-    global mydb
-    mydb = mysql.connector.connect(
-        host=credentials['host'],
-        user=credentials['username'],
-        password=credentials['password'],
-        database=credentials['dbname']
-    )
-    global mycursor
-    mycursor = mydb.cursor()
 
 def validate_email():
     mycursor.execute(f'SELECT * FROM employees WHERE email = "{event_body["email"]}"')

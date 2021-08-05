@@ -7,6 +7,7 @@ import boto3
 import botocore.config
 
 import mysql.connector
+import smart_city
 
 event_body = None
 mydb = None
@@ -24,7 +25,7 @@ def lambda_handler(event, context):
         return invalid
 
     # connect to MySQL
-    mysql_connect()
+    mydb, mycursor = smart_city.db_connect()
 
     # get id number
     event_body["id_number"] = get_id_number()
@@ -34,7 +35,6 @@ def lambda_handler(event, context):
 
     # prepare and insert problem into problems table
     insert_problem()
-    mydb.commit()
     
     global lambda_client
     lambda_client = boto3.client('lambda')
@@ -82,20 +82,6 @@ def validate_input():
             'body': "'image_path' is a required field which must be a list of strings"
         }
 
-def mysql_connect():
-    sm_client = boto3.client("secretsmanager")
-    secret = sm_client.get_secret_value(SecretId='MySQL-Credentials')
-    credentials = json.loads(secret['SecretString'])
-    global mydb
-    mydb = mysql.connector.connect(
-        host=credentials['host'],
-        user=credentials['username'],
-        password=credentials['password'],
-        database=credentials['dbname']
-    )
-    global mycursor
-    mycursor = mydb.cursor()
-
 def get_id_number():
     mycursor.execute(f"SHOW CREATE TABLE problems")
     id_number = mycursor.fetchall()[0][1]
@@ -124,6 +110,7 @@ def insert_problem():
     insert = "INSERT INTO problems (problem_type, problem_description, location, image_path) VALUES (%s, %s, point(%s, %s), %s)"
     val = (event_body["problem_type"], event_body["problem_description"], event_body["location"][1], event_body["location"][0], event_body["image_path"])
     mycursor.execute(insert, val)
+    mydb.commit()
 
 def email_employees():
     mycursor.execute(f"SELECT email FROM employees WHERE current_assignment_id IS null AND department = '{event_body['problem_type']}'")

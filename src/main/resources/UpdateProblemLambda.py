@@ -3,6 +3,7 @@ import json
 import boto3
 
 import mysql.connector
+import smart_city
 
 event_body = None
 mydb = None
@@ -17,8 +18,8 @@ def lambda_handler(event, context):
     invalid_size = validate_input_size()
     if invalid_size:
         return invalid_size
-
-    mysql_connect()
+        
+    mydb, mycursor = smart_city.db_connect()
 
     # check input to ensure it is valid
     invalid = validate_input()
@@ -41,20 +42,6 @@ def validate_input_size():
             'statusCode': 400,
             'body': f'Three items required. Received {len(event_body)}.\nInput: {json.dumps(event_body)}'
         }
-    
-def mysql_connect():
-    sm_client = boto3.client("secretsmanager")
-    secret = sm_client.get_secret_value(SecretId='MySQL-Credentials')
-    credentials = json.loads(secret['SecretString'])
-    global mydb
-    mydb = mysql.connector.connect(
-        host=credentials['host'],
-        user=credentials['username'],
-        password=credentials['password'],
-        database=credentials['dbname']
-    )
-    global mycursor
-    mycursor = mydb.cursor()
     
 def validate_input():
 

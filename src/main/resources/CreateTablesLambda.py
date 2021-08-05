@@ -5,6 +5,7 @@ import urllib3
 import boto3
 
 import mysql.connector
+import smart_city
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -42,13 +43,7 @@ def create_tables():
     connection_cursor.execute(create_schema)
     
     # connect to database
-    mydb = mysql.connector.connect(
-        host=credentials['host'],
-        user=credentials['username'],
-        password=credentials['password'],
-        database=credentials['dbname']
-    )
-    mycursor = mydb.cursor()
+    mydb, mycursor = smart_city.db_connect()
     
     # create tables
     create_problems = "CREATE TABLE problems (id int NOT NULL AUTO_INCREMENT, problem_type enum('Criminal Act','Environmental Hazard','Road Hazard','Vehicle Damage','Fire','Water Damage','Other') NOT NULL, problem_description text NOT NULL, time_found datetime NOT NULL DEFAULT CURRENT_TIMESTAMP, current_status enum('Open','In Progress','Complete') NOT NULL DEFAULT 'Open', location point NOT NULL, image_path text, PRIMARY KEY (id))"

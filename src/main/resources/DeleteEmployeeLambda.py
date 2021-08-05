@@ -3,6 +3,7 @@ import json
 import boto3
 
 import mysql.connector
+import smart_city
 
 event_body = None
 mydb = None
@@ -19,7 +20,7 @@ def lambda_handler(event, context):
         return invalid
         
     # connect to MySQL
-    mysql_connect()
+    mydb, mycursor = smart_city.db_connect()
 
     # check id to ensure it is valid
     invalid_id = validate_id()
@@ -50,20 +51,6 @@ def validate_input():
             'statusCode': 400,
             'body': "'id' is a required field and must be of type int"
         }
-
-def mysql_connect():
-    sm_client = boto3.client("secretsmanager")
-    secret = sm_client.get_secret_value(SecretId='MySQL-Credentials')
-    credentials = json.loads(secret['SecretString'])
-    global mydb
-    mydb = mysql.connector.connect(
-        host=credentials['host'],
-        user=credentials['username'],
-        password=credentials['password'],
-        database=credentials['dbname']
-    )
-    global mycursor
-    mycursor = mydb.cursor()
 
 def validate_id():
     mycursor.execute("SELECT id FROM employees")
