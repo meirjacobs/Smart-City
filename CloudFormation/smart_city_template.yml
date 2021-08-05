@@ -297,9 +297,20 @@ Resources:
     Properties:
       AllocatedStorage: 5
       DBInstanceClass: db.t2.micro
+      VPCSecurityGroups:
+      - Fn::GetAtt: [ SmartCitySecurityGroup, GroupId ]
       Engine: mysql
       MasterUsername: !Join [ '', [ '{{resolve:secretsmanager:', !Ref MySQLSecret, ':SecretString:username}}' ] ]
       MasterUserPassword: !Join [ '', [ '{{resolve:secretsmanager:', !Ref MySQLSecret, ':SecretString:password}}' ] ]
+  SmartCitySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable General access via port 3306
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '3306'
+        ToPort: '3306'
+        CidrIp: 0.0.0.0/0
   MySQLSecretHost:
     Type: "AWS::SecretsManager::SecretTargetAttachment"
     Properties:
@@ -328,6 +339,9 @@ Resources:
       - MySQLSecretHost
   SmartCityDashboard:
     Type: AWS::CloudWatch::Dashboard
+    DependsOn: 
+      - MySQLSecret
+      - MySQLSecretHost
     Properties:
       DashboardName: SmartCityDashboard
       DashboardBody: !Sub >-
