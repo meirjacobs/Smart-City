@@ -298,7 +298,7 @@ Resources:
       AllocatedStorage: 5
       DBInstanceClass: db.t2.micro
       VPCSecurityGroups:
-      - Ref: SmartCitySecurityGroup
+      - Fn::GetAtt: [ SmartCitySecurityGroup, GroupId ]
       Engine: mysql
       MasterUsername: !Join [ '', [ '{{resolve:secretsmanager:', !Ref MySQLSecret, ':SecretString:username}}' ] ]
       MasterUserPassword: !Join [ '', [ '{{resolve:secretsmanager:', !Ref MySQLSecret, ':SecretString:password}}' ] ]
