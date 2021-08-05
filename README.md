@@ -30,7 +30,8 @@ Follow the instructions in the 'Parameters' section.
 5. Open your browser of choice, visit [localhost:8080](https://localhost:8080), and enjoy.
 
 6. (Optional) If you would like to run the tests that we have created, please follow these steps:
-    * First, make sure you have all the correct libraries installed by checking the requirements.txt. To install them, navigate to the test/dependencies folder and run: `pip install -r requirements.txt`.
+    * Download the [test files](https://downgit.github.io/#/home?url=https://github.com/meirjacobs/Smart-City/tree/main/src/test) then extract them.
+    * Make sure you have all the correct libraries installed by checking the requirements.txt. To install them, navigate to the test/dependencies folder and run: `pip install -r requirements.txt`.
     * Create a .env file in the test/resources folder to hold the environment variables for the tests. As mentioned earlier, these values may be retrieved from the [API Gateway Console](https://console.aws.amazon.com/apigateway/main/apis) and the [Secrets Manager Console](https://console.aws.amazon.com/secretsmanager/home).\
     Please use the template below. Don't use quotes:
     ```
