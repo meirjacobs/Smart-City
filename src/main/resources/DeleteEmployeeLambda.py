@@ -20,6 +20,8 @@ def lambda_handler(event, context):
         return invalid
         
     # connect to MySQL
+    global mydb
+    global mycursor
     mydb, mycursor = smart_city.db_connect()
 
     # check id to ensure it is valid
@@ -33,6 +35,9 @@ def lambda_handler(event, context):
 
     # delete employee from employees table
     delete_employee()
+
+    mycursor.close()
+    mydb.close()
 
     return {
         'statusCode' : 200,

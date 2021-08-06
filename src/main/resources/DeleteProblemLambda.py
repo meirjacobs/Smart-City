@@ -18,6 +18,8 @@ def lambda_handler(event, context):
     validate_input()
 
     # connect to MySQL
+    global mydb
+    global mycursor
     mydb, mycursor = smart_city.db_connect()
 
     # delete problem from problems table & return whether delete was succesful or not
@@ -41,6 +43,8 @@ def delete_problem():
     mydb.commit()
     
     effected_rows = mycursor.rowcount
+    mycursor.close()
+    mydb.close()
     if effected_rows == 0:
         return {
             'statusCode': 400,

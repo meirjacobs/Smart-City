@@ -18,7 +18,10 @@ def lambda_handler(event, context):
     invalid_size = validate_input_size()
     if invalid_size:
         return invalid_size
-        
+    
+    # connect to MySQL
+    global mydb
+    global mycursor    
     mydb, mycursor = smart_city.db_connect()
 
     # check input to ensure it is valid
@@ -160,6 +163,8 @@ def update_tables():
             mycursor.execute(f'UPDATE problems SET current_status = "{event_body["current_status"]}" WHERE id = {event_body["id"]}')
     
     mydb.commit()
+    mycursor.close()
+    mydb.close()
     
     # insert log to logs_history
     lambda_client.invoke(

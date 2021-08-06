@@ -16,6 +16,8 @@ def lambda_handler(event, context):
     mycursor = mydb.cursor()
     mycursor.execute(insert, val)
     mydb.commit()
+    mycursor.close()
+    mydb.close()
 
     return {
         'statusCode' : 200,

@@ -47,12 +47,11 @@ def create_tables():
     
     # create tables
     create_problems = "CREATE TABLE problems (id int NOT NULL AUTO_INCREMENT, problem_type enum('Criminal Act','Environmental Hazard','Road Hazard','Vehicle Damage','Fire','Water Damage','Other') NOT NULL, problem_description text NOT NULL, time_found datetime NOT NULL DEFAULT CURRENT_TIMESTAMP, current_status enum('Open','In Progress','Complete') NOT NULL DEFAULT 'Open', location point NOT NULL, image_path text, PRIMARY KEY (id))"
-    create_employees = "CREATE TABLE employees (id int NOT NULL AUTO_INCREMENT, first_name text NOT NULL, last_name text NOT NULL, email text NOT NULL, password text NOT NULL, department enum('Criminal Act','Environmental Hazard','Road Hazard','Vehicle Damage','Fire','Water Damage','Other') NOT NULL, current_assignment_id int DEFAULT NULL, PRIMARY KEY (id))"
+    create_employees = "CREATE TABLE employees (id int NOT NULL AUTO_INCREMENT, first_name text NOT NULL, last_name text NOT NULL, email text NOT NULL, pwd text NOT NULL, department enum('Criminal Act','Environmental Hazard','Road Hazard','Vehicle Damage','Fire','Water Damage','Other') NOT NULL, current_assignment_id int DEFAULT NULL, PRIMARY KEY (id))"
     create_logs = "CREATE TABLE logs_history (id int NOT NULL AUTO_INCREMENT, time_logged datetime NOT NULL DEFAULT CURRENT_TIMESTAMP, problem_id int NOT NULL, problem_type enum('Criminal Act','Environmental Hazard','Road Hazard','Vehicle Damage','Fire','Water Damage','Other') NOT NULL, problem_description text NOT NULL, time_found datetime NOT NULL, current_status enum('Open','In Progress','Complete') NOT NULL, previous_status enum('Open','In Progress','Complete') DEFAULT NULL, assigned_employee_id int DEFAULT NULL, location point NOT NULL, image_path text, PRIMARY KEY (id))"
     mycursor.execute(create_problems)
     mycursor.execute(create_employees)
     mycursor.execute(create_logs)
-    mydb.commit
     
     # verify that the tables are created
     mycursor.execute("SHOW TABLES LIKE 'problems'")
@@ -61,6 +60,9 @@ def create_tables():
     employees_result = mycursor.fetchall()[0][0]
     mycursor.execute("SHOW TABLES LIKE 'logs_history'")
     logs_result = mycursor.fetchall()[0][0]
+    mycursor.close()
+    mydb.close()
+
     if problems_result == None or employees_result == None or logs_result == None:
         return {"Data": "Error: Tables were not created"}
     else:

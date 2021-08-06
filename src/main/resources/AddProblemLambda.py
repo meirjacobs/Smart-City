@@ -25,6 +25,8 @@ def lambda_handler(event, context):
         return invalid
 
     # connect to MySQL
+    global mydb
+    global mycursor
     mydb, mycursor = smart_city.db_connect()
 
     # get id number
@@ -44,6 +46,9 @@ def lambda_handler(event, context):
 
     # prepare and insert data into logs_history table
     log_problem()
+
+    mycursor.close()
+    mydb.close()
 
     return {
         'statusCode': 200,

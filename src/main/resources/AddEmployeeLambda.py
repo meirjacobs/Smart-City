@@ -21,6 +21,8 @@ def lambda_handler(event, context):
         return invalid
     
     # connect to MySQL
+    global mydb
+    global mycursor
     mydb, mycursor = smart_city.db_connect()
 
     # ensure email is unique within database
@@ -30,6 +32,9 @@ def lambda_handler(event, context):
     
     # insert employee into employees table
     insert_employee()
+
+    mycursor.close()
+    mydb.close()
 
     return {
         'statusCode' : 200,
@@ -74,10 +79,10 @@ def validate_input():
             'body': "The email you entered was not valid. Please try again."
         }
     
-    if "password" not in event_body or not isinstance(event_body["password"], str):
+    if "pwd" not in event_body or not isinstance(event_body["pwd"], str):
         return {
             'statusCode': 400,
-            'body': "'password' is a required field and must be of type string"
+            'body': "'pwd' is a required field and must be of type string"
         }
         
    
@@ -98,7 +103,7 @@ def validate_email():
         }
 
 def insert_employee():
-    insert = "INSERT INTO employees (first_name, last_name, email, password, department) VALUES (%s, %s, %s, %s, %s)"
-    val = (event_body["first_name"], event_body["last_name"], event_body["email"], event_body["password"], event_body["department"])
+    insert = "INSERT INTO employees (first_name, last_name, email, pwd, department) VALUES (%s, %s, %s, %s, %s)"
+    val = (event_body["first_name"], event_body["last_name"], event_body["email"], event_body["pwd"], event_body["department"])
     mycursor.execute(insert, val)
     mydb.commit()

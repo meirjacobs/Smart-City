@@ -28,7 +28,7 @@ import java.util.List;
 public class SmartCityController implements CommandLineRunner {
 
     @Autowired
-    private Environment     env;
+    private Environment env;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -199,15 +199,15 @@ public class SmartCityController implements CommandLineRunner {
         // need id, first_name,last_name, department, current_assignment_id
         String username = body.getUsername();
         String password = body.getPassword();
-        String employee_idQuery = "Select id from employees where email = \"" +username+ "\"  and password = \"" +password+ "\"";
+        String employee_idQuery = "Select id from employees where email = \"" +username+ "\"  and pwd = \"" +password+ "\"";
         String employee_id = jdbcTemplate.queryForObject(employee_idQuery,String.class);
-        String first_nameQuery = "Select first_name from employees where email = \"" +username+ "\"  and password = \"" +password+ "\"";
+        String first_nameQuery = "Select first_name from employees where email = \"" +username+ "\"  and pwd = \"" +password+ "\"";
         String first_name = jdbcTemplate.queryForObject(first_nameQuery,String.class);
-        String last_nameQuery = "Select last_name from employees where email = \"" +username+ "\"  and password = \"" +password+ "\"";
+        String last_nameQuery = "Select last_name from employees where email = \"" +username+ "\"  and pwd = \"" +password+ "\"";
         String last_name = jdbcTemplate.queryForObject(last_nameQuery,String.class);
-        String current_statusQuery = "Select current_assignment_id from employees where email = \"" +username+ "\"  and password = \"" +password+ "\"";
+        String current_statusQuery = "Select current_assignment_id from employees where email = \"" +username+ "\"  and pwd = \"" +password+ "\"";
         String current_status = jdbcTemplate.queryForObject(current_statusQuery,String.class);
-        String departmentQuery = "Select department from employees where email = \"" +username+ "\"  and password = \"" +password+ "\"";
+        String departmentQuery = "Select department from employees where email = \"" +username+ "\"  and pwd = \"" +password+ "\"";
         String department = jdbcTemplate.queryForObject(departmentQuery,String.class);
         String current_assignment_id = "";
         if (current_status == null) {
