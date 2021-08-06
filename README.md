@@ -4,7 +4,7 @@ Code repository for the Smart City team for Yeshiva University's Industrial Soft
 
 ## About
 We built a deployable Smart City Reporting System. Using AWS, we created a system that allows users to report and query issues in a city. We then used Spring Boot to create a web application built on our AWS system that allows both regular users and city employees to easily add, update, and query information. Finally, we used Docker to create an executable file that anyone can pull and run.\
-For more details, please take a look at our [slideshow](https://github.com/meirjacobs/Smart-City/blob/main/Smart%20City%20Reporting%20System.pptx).
+For more details, please take a look at our [YouTube video](https://youtu.be/Sxdd5BMu2iI). Alternatively, you can view our [slideshow](https://github.com/meirjacobs/Smart-City/blob/main/Smart%20City%20Reporting%20System.pptx).
 
 ## Steps for Deployment
 
